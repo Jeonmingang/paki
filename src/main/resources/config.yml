@@ -1,0 +1,27 @@
+machine:
+  rows: 12
+  cols: 9
+  tick-interval: 2
+  left-bias: 52
+  wall-bounce: true
+  hole-payout: [0,1,2,0,10,0,2,1,0]   # 각 홀의 메달 배당
+
+economy:
+  use-vault: true           # Vault 없으면 자동 비활성
+  yen-per-medal: 100        # 메달 1개당 돈
+  emerald-per-ball: 1
+  balls-per-exchange: 10    # /파칭코 환전 시 구슬 지급 단위
+
+payout-stream:
+  enabled: true
+  balls-per-medal: 10       # 당첨 메달 1개당 "구슬" 몇 개를 토해낼지
+  drop-interval-ticks: 1    # 구슬 방출 간격
+  max-total-balls: 500      # 안전장치(라그 방지)
+  item-material: IRON_NUGGET
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+
+messages:
+  start: "&b[파칭코]&f 구슬 투입!"
+  no-ball: "&c구슬이 없습니다. /파칭코 환전 으로 바꾸세요."
+  result: "&e결과: &6{medal} 메달 획득! (누적 {total})"
+  jackpot: "&c&lJACKPOT! &f구슬 {balls}개가 방출됩니다!"

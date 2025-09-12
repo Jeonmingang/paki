@@ -1,0 +1,9 @@
+name: PachinkoReal
+main: com.minkang.ultimate.pachinko.Main
+version: 1.1.0
+api-version: 1.16
+commands:
+  파칭코:
+    usage: /파칭코 [시작|환전|교환|설치]
+    description: Pachinko machine
+permissions: {}

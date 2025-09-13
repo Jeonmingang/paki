@@ -1,0 +1,73 @@
+ball-item: IRON_NUGGET
+
+machine:
+  rows: 8
+  cols: 7
+  tick-interval: 4        # 느리게 보이도록 기본값 4tick
+  left-bias: 52
+  hole-payout: [0,1,2,4,2,1,0]
+
+structure:
+  glass: WHITE_STAINED_GLASS
+  pin: IRON_BARS
+  top-hopper: true
+  deco-emerald: true
+  start-block:
+    material: GOLD_BLOCK
+    offset: [4, 0, 0]         # 기계 밖의 시작 블럭
+  payout-hole-offset: [3, 0, 0]   # 구슬 배출 구멍 위치
+
+effects:
+  start-sound: UI_BUTTON_CLICK
+  hit-sound: BLOCK_NOTE_BLOCK_PLING
+  jackpot-sound: ENTITY_PLAYER_LEVELUP
+  lucky-click-sound: BLOCK_NOTE_BLOCK_PLING
+  continue-sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  stageup-sound: ENTITY_PLAYER_LEVELUP
+  capup-sound: BLOCK_PISTON_EXTEND
+  particles-on-move: false
+
+payout-stream:
+  balls-per-win: 5
+  drop-interval-ticks: 2
+  max-total-balls: 400
+
+lucky:
+  enabled: true
+  columns: [3]               # 가운데 열에서 Lucky 진입
+  round-cap: 150             # 1스테이지 기본 천장(최대 지급량)
+  click-gain: 3              # 우클릭 1회당 지급되는 수량
+  continue-chance: 40        # 스테이지 종료 시 다음 스테이지로 이어질 확률(%)
+  max-stages: 3
+  music: MUSIC_DISC_CAT
+  title-start: "&d럭키 타임!"
+  title-continue: "&b계속!"
+  title-stageup: "&6스테이지 업!"
+  title-capup: "&a천장 +{amount}!"
+  # 상태 서브타이틀(타이틀 하단). {stage}/{max} {paid}/{cap} 치환됨
+  title-sub-status: "&e스테이지 {stage}/{max}  &f{paid}/{cap}"
+  center-hit-continue-chance: 30  # Lucky 중 가운데 들어오면 추가 스테이지로 바로 승격될 확률(%)
+  cap-increase-on-center: 30      # Lucky 중 가운데면 천장 즉시 +이 수치
+
+slot:
+  enabled: true
+  center-only: true          # 가운데 들어갔을 때만 3연 슬롯
+  digits: 3
+  symbols: 10                # 0~9
+  jackpot-when-all-equal: true
+  chat-prefix: "&a[슬롯] "
+  show-each-roll: true
+
+machines: {}
+messages:
+  created: "&a파칭코 #{id} 설치 완료"
+  removed: "&c파칭코 #{id} 삭제 완료"
+  list-title: "&e[파칭코 목록]"
+  need-ball: "&c소모할 구슬이 없습니다. &7(/파칭코 설정 구슬 로 아이템 지정)"
+  set-ball: "&a구슬이 &f{mat}&a(으)로 설정되었습니다."
+  start: "&b구슬 투입!"
+  slot-rolling: "&7슬롯 굴림: {a}-{b}-{c}"
+  slot-jackpot: "&6잭팟!! LUCKY TIME 진입!"
+  slot-fail: "&7아쉽네요!"
+  lucky-status: "&e[스테이지 {stage}/{max}] &f지급 {paid}/{cap} &7(남은 {remain})"
+  lucky-finish: "&d럭키 타임 종료! 총 지급: {total}"

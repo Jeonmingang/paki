@@ -101,9 +101,13 @@ public class MachineRegistry {
         return a;
     }
 }
-
+catch(Throwable ignored){}
+        }
+    
     public void refreshSigns(){
         for (Machine m : all()){
-            try{ m.updateSignLines(this);}catch(Throwable ignored){}
+            try { m.updateSignLines(this); } catch (Throwable ignored) {}
         }
     }
+
+}

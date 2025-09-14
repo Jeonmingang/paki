@@ -13,6 +13,7 @@ public class Main extends JavaPlugin {
     private static Main inst;
     private MachineRegistry registry;
     private LuckyManager lucky;
+    private RankStore ranks;
     private final Map<java.util.UUID, Long> lastInsert = new HashMap<java.util.UUID, Long>();
 
     // cached ball (global)
@@ -32,6 +33,7 @@ public class Main extends JavaPlugin {
         lucky = new LuckyManager(this);
         getCommand("파칭코").setExecutor(new PCommand(this));
         Bukkit.getPluginManager().registerEvents(new UiListener(this), this);
+        ranks = new RankStore(getDataFolder());
         // load global ball
         loadBallFromConfig();
     }
@@ -148,3 +150,7 @@ public class Main extends JavaPlugin {
     }
     
 }
+
+    public RankStore getRanks(){ return ranks; }
+
+    @Override public void onDisable(){ try{ if (ranks!=null) ranks.save(); }catch(Exception ignored){} }

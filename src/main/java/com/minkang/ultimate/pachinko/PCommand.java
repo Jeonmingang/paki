@@ -120,6 +120,27 @@ public class PCommand implements CommandExecutor {
             return true;
         }
 
+
+        // 랭킹
+        if (args[0].equalsIgnoreCase("랭킹")){
+            java.util.List<RankStore.Stats> top = plugin.getRanks().top(10);
+            p.sendMessage("§d§l[ 파칭코 랭킹 TOP 10 ]");
+            int i=1;
+            for (RankStore.Stats s : top){
+                String name = (s.name==null||s.name.isEmpty()) ? s.uuid.toString().substring(0,8) : s.name;
+                p.sendMessage(String.format("§d#%d §f%s §7| §b진입§f %d §7| §a업§f %d §7| §6최고스테이지§f %d §7| §5완주§f %d §7| §e총지급§f %d",
+                        i++, name, s.centerHits, s.stageUps, s.bestStage, s.finishes, s.totalPayout));
+            }
+            RankStore.Stats me = plugin.getRanks().get(p.getUniqueId());
+            if (me != null){
+                p.sendMessage(String.format("§8당신: §f%s §7| §b진입§f %d §7| §a업§f %d §7| §6최고§f %d §7| §5완주§f %d §7| §e총지급§f %d",
+                        p.getName(), me.centerHits, me.stageUps, me.bestStage, me.finishes, me.totalPayout));
+            } else {
+                p.sendMessage("§8당신의 기록이 아직 없습니다. 중앙에 넣어보세요!");
+            }
+            return true;
+        }
+    
         help(p);
         return true;
     }

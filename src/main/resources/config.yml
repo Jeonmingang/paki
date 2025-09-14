@@ -162,3 +162,30 @@ messages:
 
 messages:
   miss-center-hopper: "&7꽝! &f{slot}번 호퍼"
+
+messages:
+  lucky-hud: "&b({min}~{max}) &7/ &f{cap}"
+
+lucky:
+  enforce-cap-increase: true
+  cap-increment-on-stage: 200
+
+
+# 스테이지 개별 설정 예시 (추가/삭제/순서 변경 가능)
+# lucky:
+#   stages:
+#     - cap: 1500
+#       min-payout: 20
+#       max-payout: 40
+#       cap-increment: 200   # ← 이 스테이지에 돌입할 때 최소 이만큼 더 크게 보정(옵션)
+#     - cap-min: 1800
+#       cap-max: 2200
+#       click-gain: 50
+#       cap-increment: 300
+
+sounds:
+  jackpot-start:
+    key: "ENTITY_PLAYER_LEVELUP"
+    volume: 1.0
+    pitch: 1.2
+

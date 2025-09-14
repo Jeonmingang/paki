@@ -343,7 +343,7 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
 
     private void sendHudRich(org.bukkit.entity.Player p, Session s){
         try{
-            StageCfg sc = current(s.stage);
+            StageCfg sc = current(s);
             int min = (sc.minPayout>=0 && sc.maxPayout>=0) ? sc.minPayout : sc.clickGain;
             int max = (sc.minPayout>=0 && sc.maxPayout>=0) ? sc.maxPayout : sc.clickGain;
             int cap = s.cap;
@@ -357,25 +357,41 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
             int st = c.getInt("hud.title-stay", 40);
             int fo = c.getInt("hud.title-fadeout", 10);
 
-            String title = titleFmt.replace("{min}", String.valueOf(min)).replace("{max}", String.valueOf(max))
-                    .replace("{cap}", String.valueOf(cap)).replace("{paid}", String.valueOf(paid)).replace("{remain}", String.valueOf(remain)).replace("&","§");
-            String sub = subFmt.replace("{min}", String.valueOf(min)).replace("{max}", String.valueOf(max))
-                    .replace("{cap}", String.valueOf(cap)).replace("{paid}", String.valueOf(paid)).replace("{remain}", String.valueOf(remain)).replace("&","§");
+            String title = titleFmt
+                    .replace("{min}", String.valueOf(min))
+                    .replace("{max}", String.valueOf(max))
+                    .replace("{cap}", String.valueOf(cap))
+                    .replace("{paid}", String.valueOf(paid))
+                    .replace("{remain}", String.valueOf(remain))
+                    .replace("&","§");
+
+            String sub = subFmt
+                    .replace("{min}", String.valueOf(min))
+                    .replace("{max}", String.valueOf(max))
+                    .replace("{cap}", String.valueOf(cap))
+                    .replace("{paid}", String.valueOf(paid))
+                    .replace("{remain}", String.valueOf(remain))
+                    .replace("&","§");
+
             p.sendTitle(title, sub, Math.max(0,fi), Math.max(0,st), Math.max(0,fo));
 
-            // actionbar with progress bar
             String barChar = c.getString("hud.bar-char", "■");
             int barSize = Math.max(1, c.getInt("hud.bar-size", 20));
-            int filled = (cap>0) ? (int)Math.round(Math.min(1.0, (double)paid / (double)cap) * barSize) : 0;
+            int filled = (cap>0) ? (int)Math.round(Math.min(1.0D, (double)paid / (double)cap) * (double)barSize) : 0;
             StringBuilder sb = new StringBuilder();
-            for (int i=0;i<barSize;i++){
-                sb.append(i<filled ? "§a"+barChar : "§7"+barChar);
+            for (int i2=0;i2<barSize;i2++){
+                sb.append(i2<filled ? "§a"+barChar : "§7"+barChar);
             }
             String bar = sb.toString();
             String abFmt = c.getString("hud.actionbar", "&f[ {bar} ] &7{paid}/{cap}");
-            String ab = abFmt.replace("{bar}", bar).replace("{paid}", String.valueOf(paid)).replace("{cap}", String.valueOf(cap)).replace("&","§");
+            String ab = abFmt
+                    .replace("{bar}", bar)
+                    .replace("{paid}", String.valueOf(paid))
+                    .replace("{cap}", String.valueOf(cap))
+                    .replace("&","§");
             try{
-                p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.bungee.api.chat.TextComponent(ab));
+                p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                        new net.md_5.bungee.api.chat.TextComponent(ab));
             }catch(Throwable t){
                 try{ p.sendMessage(ab); }catch(Throwable ignored){}
             }

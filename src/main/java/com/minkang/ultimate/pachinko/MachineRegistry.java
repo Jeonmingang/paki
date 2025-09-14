@@ -26,11 +26,7 @@ public class MachineRegistry {
 
     public int addWithCols(Location base, int cols){
         int id = nextId();
-        Machine m = new Machine();
-        m.id = id;
-        m.base = base.clone();
-        m.rows = plugin.getConfig().getInt("structure.rows", 8);
-        m.cols = cols;
+        Machine m = new Machine(id, base, plugin.getConfig().getInt("structure.rows", 8), cols);
         // load default per-machine overrides from global ball settings
         m.ballItem = plugin.getBallMaterial().name();
         String nm = plugin.getBallName();
@@ -69,11 +65,7 @@ public class MachineRegistry {
                 double z=Double.parseDouble(sp[3]);
                 int rows = Integer.parseInt(sp[4]);
                 int cols = Integer.parseInt(sp[5]);
-                Machine m = new Machine();
-                m.id = id;
-                m.base = new Location(w,x,y,z);
-                m.rows = rows;
-                m.cols = cols;
+                Machine m = new Machine(id, base, plugin.getConfig().getInt("structure.rows", 8), cols);
                 m.ballItem = ms.getString("ball-item", null);
                 m.ballName = ms.getString("ball-name", null);
                 java.util.List<String> lore = ms.getStringList("ball-lore");
@@ -104,5 +96,25 @@ public class MachineRegistry {
         for (Machine m : all()){
             try{ m.updateSignLines(this); }catch(Throwable ignored){}
         }
+    
+    // convenience config readers
+    public String cfgStr(String path){
+        return plugin.getConfig().getString(path);
+    }
+    public int[] cfgIntArray(String path){
+        java.util.List<Integer> li = plugin.getConfig().getIntegerList(path);
+        if (li!=null && li.size()>=3){
+            return new int[]{li.get(0), li.get(1), li.get(2)};
+        }
+        String s = plugin.getConfig().getString(path, "0,0,0");
+        if (s!=null){
+            String[] sp = s.split(",");
+            if (sp.length>=3){
+                try{
+                    return new int[]{Integer.parseInt(sp[0].trim()), Integer.parseInt(sp[1].trim()), Integer.parseInt(sp[2].trim())};
+                }catch(Exception ignored){}
+            }
+        }
+        return new int[]{0,0,0};
     }
 }

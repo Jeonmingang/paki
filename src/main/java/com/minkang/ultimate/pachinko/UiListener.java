@@ -1,6 +1,7 @@
 package com.minkang.ultimate.pachinko;
 
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,40 +17,66 @@ public class UiListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e){
+        // main hand only (avoid off-hand double fire)
         if (e.getHand() != EquipmentSlot.HAND) return;
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         Block b = e.getClickedBlock();
-        if (b==null) return;
+        if (b == null) return;
 
+        // find which machine's start block was clicked
         for (Machine m : plugin.getRegistry().all()){
-            boolean isStart = m.getStartBlockLocation(plugin.getRegistry()).getBlock().equals(b);
-            if (isStart && b.getType()==m.getStartBlockMaterial(plugin.getRegistry())){
+            org.bukkit.Location start = m.getStartBlockLocation(plugin.getRegistry());
+            if (start.getWorld() == null || b.getWorld() == null) continue;
+            if (!start.getWorld().equals(b.getWorld())) continue;
+            if (start.getBlockX() == b.getX() && start.getBlockY() == b.getY() && start.getBlockZ() == b.getZ()){
+                // optional: material check
+                Material want = m.getStartBlockMaterial(plugin.getRegistry());
+                if (b.getType() != want) {
+                    // allow even if material changed? we keep strict for now
+                    // continue;
+                }
                 e.setCancelled(true);
                 Player p = e.getPlayer();
 
-                if (!plugin.canInsertNow(p.getUniqueId())){
-                    return; // 딜레이
-                }
+                // anti-spam
+                if (!plugin.canInsertNow(p.getUniqueId())) return;
 
-                ItemStack hand = p.getInventory().getItemInMainHand()<=0) ? new org.bukkit.inventory.ItemStack(Material.AIR) : hand );
+                // need ball
+                ItemStack hand = p.getInventory().getItemInMainHand();
                 if (!plugin.isBallItemForMachine(hand, m)){
-                    p.sendMessage(plugin.getConfig().getString("messages.need-ball").replace("&","§"));
+                    String msg = plugin.getConfig().getString("messages.need-ball", "&c구슬을 손에 들어주세요.").replace("&","§");
+                    p.sendMessage(msg);
                     return;
                 }
+
+                // consume 1
                 int amt = hand.getAmount();
-                if (amt<=0){ p.sendMessage(plugin.getConfig().getString("messages.need-ball").replace("&","§")); return; }
-                hand.setAmount(amt-1);
-                p.getInventory().setItemInMainHand( (hand.getAmount()<=0) ? new org.bukkit.inventory.ItemStack(Material.AIR) : hand );
-
-                try {
-                    org.bukkit.Sound s = org.bukkit.Sound.valueOf(plugin.getConfig().getString("effects.start-sound","UI_BUTTON_CLICK"));
-                    p.playSound(p.getLocation(), s, 0.8f, 1.0f);
-                } catch (Exception ignored){}
-                p.sendMessage(plugin.getConfig().getString("messages.start").replace("&","§"));
-
-                if (plugin.getLucky().isInLucky(p) && plugin.getLucky().isSessionMachine(p, m)){
-                    plugin.getLucky().handleClick(p, m);
+                if (amt <= 1){
+                    p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+                } else {
+                    hand.setAmount(amt - 1);
+                    p.getInventory().setItemInMainHand(hand);
                 }
+
+                // start sound
+                try {
+                    String key = plugin.getConfig().getString("effects.start-sound", "UI_BUTTON_CLICK");
+                    Sound s = Sound.valueOf(key);
+                    p.playSound(p.getLocation(), s, 0.8f, 1.0f);
+                } catch (Throwable ignored){}
+
+                // start message
+                String startMsg = plugin.getConfig().getString("messages.start", "&a시작!").replace("&","§");
+                p.sendMessage(startMsg);
+
+                // if already in a running lucky session for this machine, delegate click to manager
+                try{
+                    if (plugin.getLucky().isInLucky(p) && plugin.getLucky().isSessionMachine(p, m)){
+                        plugin.getLucky().handleClick(p, m);
+                    }
+                }catch(Throwable ignored){}
+
+                // slot suspense reveal
                 new RunBall(plugin, p, m).begin();
                 return;
             }

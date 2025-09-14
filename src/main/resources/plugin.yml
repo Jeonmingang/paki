@@ -1,6 +1,6 @@
 name: PachinkoReal
 main: com.minkang.ultimate.pachinko.Main
-version: 3.6.2
+version: 3.6.3
 api-version: 1.16
 commands:
   파칭코:

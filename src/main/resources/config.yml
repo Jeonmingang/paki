@@ -50,7 +50,7 @@ structure:
     offset: [3, 0, 0]
   sign:
     enabled: true              # 설치 시 확률 안내 표지판 자동 생성
-    type: OAK_SIGN
+    type: OAK_WALL_SIGN
     offset: [3, 1, -1]
 
 # [연출/이펙트] — 모두 바닐라 사운드/파티클만 사용
@@ -159,3 +159,6 @@ messages:
   lucky-finish: "&d럭키 타임 종료! 총 지급: {total}"
   give-ok: "&a{player}에게 구슬 {amount}개 지급"
   give-no-player: "&c해당 플레이어를 찾을 수 없습니다."
+
+messages:
+  miss-center-hopper: "&7꽝! &f{slot}번 호퍼"

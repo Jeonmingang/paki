@@ -81,6 +81,21 @@ public class Machine {
         }
     }
 
+    
+    public void updateSign(MachineRegistry reg){
+        if (!reg.plugin().getConfig().getBoolean("structure.sign.enabled", true)) return;
+        Location sLoc = getSignLocation(reg);
+        if (sLoc.getBlock().getType().name().endsWith("_SIGN")){
+            try{
+                org.bukkit.block.Sign sign = (org.bukkit.block.Sign) sLoc.getBlock().getState();
+                sign.setLine(0, "§6[파칭코]");
+                sign.setLine(1, "§7중앙: §f" + reg.plugin().getGlobalCenterHitPercent() + "%");
+                sign.setLine(2, "§7잭팟: §f" + reg.plugin().getGlobalJackpotPercent() + "%");
+                sign.setLine(3, "§7#"+id);
+                sign.update();
+            }catch(Exception ignored){}
+        }
+    }
     public void clear(){
         World w = base.getWorld();
         for (int y=0; y< rows + 10; y++){

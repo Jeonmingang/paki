@@ -1,4 +1,22 @@
 
+slot:
+  spin-effect: true
+  suspense:
+    tick: 2
+    min-spins: 10
+    max-spins: 20
+    last-extra-min: 20
+    last-extra-max: 40
+    reveal: horizontal       # horizontal | all
+    stop-order: LMR          # LMR | MLR | RLM | random
+    loop-sound: BLOCK_NOTE_BLOCK_HAT
+    stop-sound: UI_BUTTON_CLICK
+    volume: 1.0
+    pitch: 1.0
+    center-roll-chance: 100  # 0~100 (잭팟 시 '중앙'로 취급될 확률)
+
+slot:
+
 # PachinkoReal 3.4.0 (1.16.5)
 # 주요 변경점:
 # 1) 잭팟 후 '중앙 홀'이면 = "다음 스테이지로 넘어갈지" 추첨. 실패 시 잭팟 재시도 없음.
@@ -35,6 +53,7 @@ messages:
 # 스테이지 목록(BGM). 원하는 만큼 추가/삭제 가능.
 # 이미 서버에 커스텀 단계를 사용 중이면 이 섹션을 그대로 유지하세요.
 stages:
+    # click-min/max 지정 시 그 범위에서 우클릭마다 랜덤 지급. 없으면 click-gain 사용
   - name: "STAGE 1"
     bgm: [ "UI_TOAST_CHALLENGE_COMPLETE" ]
   - name: "STAGE 2"

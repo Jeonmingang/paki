@@ -98,5 +98,25 @@ public class Main extends JavaPlugin {
                 }
             }
         }
+    
+    public int getJackpotSlotIndex(int cols){
+        String raw = getConfig().getString("slot.jackpot-slot","center");
+        if (raw==null) raw="center";
+        String v = raw.trim().toLowerCase();
+        if (v.equals("left")) return 0;
+        if (v.equals("right")) return Math.max(0, cols-1);
+        if (v.equals("center")) return cols/2;
+        try{
+            int one = Integer.parseInt(v);
+            return Math.max(0, Math.min(cols-1, one-1));
+        }catch(Exception e){
+            return cols/2;
+        }
     }
+    public void updateAllSigns(){
+        for (Machine m : registry.all()){
+            try{ m.updateSign(registry); }catch(Exception ignored){}
+        }
+    }
+    
 }

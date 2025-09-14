@@ -31,7 +31,7 @@ public class LuckyManager {
             int baseCap = plugin.getConfig().getInt("cap.base", 64);
             s = new Session(p, baseCap);
             sessions.put(p.getUniqueId(), s);
-        }
+        } playStageMusic(s);
         return s;
     }
 
@@ -61,7 +61,7 @@ public class LuckyManager {
     }
 
     public void advanceStage(Session s){
-        s.stage++;
+        s.stage++; playStageMusic(s);
         // increase CAP
         int inc = plugin.getConfig().getInt("cap.per-stage", 32);
         s.cap += Math.max(0, inc);
@@ -95,5 +95,24 @@ public class LuckyManager {
                 .replace("{remain}", String.valueOf(s.remaining()))
                 .replace("&","§");
         s.player.sendMessage(msg);
+    
+    private void playStageMusic(Session s){
+        try{
+            java.util.List<?> stages = plugin.getConfig().getList("stages");
+            if (stages==null) return;
+            int idx = Math.max(0, Math.min(stages.size()-1, s.stage-1));
+            Object raw = stages.get(idx);
+            if (raw instanceof java.util.Map){
+                Object bgm = ((java.util.Map<?,?>)raw).get("bgm");
+                if (bgm instanceof java.util.List && !((java.util.List<?>)bgm).isEmpty()){
+                    Object key = ((java.util.List<?>)bgm).get(0);
+                    if (key!=null){
+                        String sound = String.valueOf(key);
+                        try{ s.player.playSound(s.player.getLocation(), org.bukkit.Sound.valueOf(sound), 1.0f, 1.0f);}catch(Exception ignored){}
+                    }
+                }
+            }
+        }catch(Exception ignored){}
     }
+    
 }

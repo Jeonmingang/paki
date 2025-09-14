@@ -127,7 +127,7 @@ public class LuckyManager {
                 stages.add(sc);
             }
         }
-        applySimpleProbabilityOverride(cfg);
+        
     }
 
     
@@ -248,7 +248,7 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
         for (String pa : pfx){
             try{ s.player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(pa), at, 40, 0.3,0.3,0.3,0.01);}catch(Exception ignored){}
         }
-        applySimpleProbabilityOverride(cfg);
+        
     }
 
     private void stepContinueOrEnd(Session s){
@@ -279,7 +279,7 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
             stopAllMusic(p, s.lastMusicKey);
             p.sendMessage(plugin.getConfig().getString("messages.lucky-finish").replace("{total}", String.valueOf(s.paidTotal)).replace("&","§"));
         }
-        applySimpleProbabilityOverride(cfg);
+        
     }
 
     public void onCenterDuringLucky(Player p, Machine m){

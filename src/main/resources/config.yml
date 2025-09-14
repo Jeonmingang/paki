@@ -1,134 +1,46 @@
-# ===============================
-#   PachinkoReal 메인 설정 파일
-#   - 모든 옵션은 서버 리로드(/파칭코 리로드)로 즉시 반영됩니다.
-# ===============================
 
-# [전역 간편 확률] — 여기 2개만 바꿔도 체감 난이도 조절 가능
-global-probability:
-  center-hit: 30      # 중앙 구멍으로 판정될 확률(%) — 실제 낙하가 중앙이 아니어도 이 값으로 중앙 판정
-  jackpot: 2          # 중앙 슬롯 연출 시 숫자 3개 동일(잭팟) 확률(%)
+# PachinkoReal 3.4.0 (1.16.5)
+# 주요 변경점:
+# 1) 잭팟 후 '중앙 홀'이면 = "다음 스테이지로 넘어갈지" 추첨. 실패 시 잭팟 재시도 없음.
+# 2) 슬롯 연출: 가로 [7] - [3] - [7], spin-effect=true면 돌아가다 순서대로 멈춤.
+# 3) 스테이지 진입마다 전서버 축하 방송 + 스테이지 표시. 캡(맥시멈)은 스테이지마다 증가.
+# 4) 스테이지별 BGM(커스텀 가능). config의 stages 섹션 수정/추가.
+# 5) /파칭코 설치 <슬롯> 시, 스샷과 유사한 구조물 생성(상단 석탄블럭, 중앙 다이아, 표지판 위치).
 
-# [기본 구슬] — 기계별로 덮어쓸 수 있음 (machines.* 의 ball-* 항목)
-ball-item: IRON_NUGGET
-ball-name: ""         # 빈 문자열이면 이름 검사 생략
-ball-lore: []         # []면 로어 검사 생략
+spin-effect: true           # 슬롯이 돌아가다가 멈추는 연출
+broadcast-on-stage: true     # 스테이지 넘어갈 때 전체 방송
+center-next-stage-chance: 0.5  # 중앙 홀일 때 다음 스테이지로 갈 확률(0.0~1.0)
 
-machine-default:
-  rows: 8                   # 세로 크기
-  cols: 7                   # 가로 크기
-  tick-interval: 4          # 구슬 낙하 속도(틱); 값이 클수록 느림
-  insert-delay-ticks: 6     # 1개 투입 후 다음 투입까지 딜레이(틱). 6틱≈0.3초
-  left-bias: 52             # 좌/우 튕김 편향(%) — 50이 중립, 값↑→왼쪽으로 더 자주 감
+# 보상 관련
+cap:
+  base: 64        # 1스테이지의 기본 맥시멈(고정)
+  per-stage: 32   # 스테이지가 1 증가할 때마다 맥시멈 증가량(+)
 
+reward:
+  min: 2          # 1회 지급 최소
+  max: 5          # 1회 지급 최대
+
+# 구조물 옵션 (표지판 상대 위치 등)
 structure:
-  glass: WHITE_STAINED_GLASS   # 배경 유리
-  pin: IRON_BARS               # 핀 블록
-  top-hopper: true             # 상단 호퍼 자동 설치
-  deco-emerald: true           # 상단 에메랄드 장식
-  auto-bottom-buttons: true    # 하단 시작/지급 블록 자동 설치
-  start-block:
-    material: GOLD_BLOCK
-    offset: [4, 0, 0]
-  payout-block:
-    material: DIAMOND_BLOCK
-    offset: [3, 0, 0]
-  sign:
-    enabled: true              # 설치 시 확률 안내 표지판 자동 생성
-    type: OAK_SIGN
-    offset: [3, 1, -1]
+  sign-offset-x: -1
+  sign-offset-y: 1
+  sign-offset-z: 0
 
-# [연출/이펙트] — 모두 바닐라 사운드/파티클만 사용
-effects:
-  particles-on-move: false       # 구슬 이동 중 파티클
-  start-sound: UI_BUTTON_CLICK   # 투입 클릭 소리
-  hit-sound: BLOCK_NOTE_BLOCK_PLING  # 핀에 맞을 때
-  jackpot:                       # 잭팟 돌입 시 고퀄 연출(순차 재생)
-    sounds: [ENTITY_PLAYER_LEVELUP, BLOCK_NOTE_BLOCK_BELL]
-    particles: [FIREWORKS_SPARK, SPELL_INSTANT]
-  stageup:                       # 스테이지 업 연출
-    sounds: [ENTITY_GENERIC_EXPLODE, ENTITY_EXPERIENCE_ORB_PICKUP]
-    particles: [VILLAGER_HAPPY, CLOUD]
-
-# [슬롯 연출] — 중앙일 때만 굴림. 마지막 숫자는 더 길게 대기하여 서스펜스 연출
-slot:
-  jackpot-slot: center   # 잭팟 판정 슬롯: center|left|right|숫자(1~슬롯수)
-  enabled: true
-  center-only: true
-  digits: 3                        # 3자리 슬롯
-  symbols: 10                      # 0..9
-  jackpot-when-all-equal: true
-  chat-prefix: "&a[슬롯] "
-  show-each-roll: true
-  suspense-delay-ticks: 12         # 각 자리 공개 기본 딜레이
-  suspense-last-extra-min: 20      # 마지막 자리 추가 딜레이 최소
-  suspense-last-extra-max: 40      # 마지막 자리 추가 딜레이 최대
-  suspense-loop-sound: BLOCK_NOTE_BLOCK_HAT  # 두구두구 효과음
-  center-roll-chance: 100          # 중앙일 때 슬롯 연출이 발생할 확률(%)
-
-# [럭키 타임 / 스테이지]
-# - cap: 고정 천장(최대 지급량)
-# - cap-min/max: 랜덤 천장(범위) — cap이 없고 둘 다 있으면 사용
-# - click-gain: 우클릭 1회당 지급되는 구슬 수
-# - continue-chance: 스테이지 종료 시 다음 스테이지로 넘어갈 확률(%)
-# - center-continue-chance: 잭팟 중 ‘중앙 히트’하면 즉시 스테이지 업 확률(%)
-# - music: 마인크래프트 네임스페이스 키 (예: minecraft:music_disc.cat)
-lucky:
-  enabled: true
-  allow-dynamic-cap: false  # true면 잭팟 중 중앙 히트 시 천장(cap) 증가 허용
-  stages:
-    - cap: 150
-      click-gain: 3
-      continue-chance: 40
-      center-continue-chance: 30
-      music: minecraft:music_disc.cat
-    - cap-min: 120
-      cap-max: 220
-      click-gain: 3
-      continue-chance: 35
-      center-continue-chance: 25
-      music: minecraft:music_disc.chirp
-    - cap-min: 160
-      cap-max: 300
-      click-gain: 4
-      continue-chance: 25
-      center-continue-chance: 20
-      music: minecraft:music_disc.stal
-  music-volume: 1.0
-  music-pitch: 1.0
-  music-stop-ticks: 2400         # 브금 자동 종료(틱)
-  title-start: "&d럭키 타임!"
-  title-continue: "&b계속!"
-  title-stageup: "&6스테이지 업!"
-  title-capup: "&a천장 +{amount}!"
-  title-sub-status: "&e스테이지 {stage}/{max}  &f{paid}/{cap}"
-  cap-increase-on-center: 30     # 잭팟 중 중앙 히트 시 천장 추가
-
-# [기계 목록] — 설치 명령으로 자동 추가되며, 여기서 각 기계별 코인으로 덮어쓸 수 있음
-# machines:
-#   '1':
-#     location: world,100,64,100,8,7  # world,x,y,z,rows,cols
-#     ball-item: GOLD_NUGGET
-#     ball-name: "&6VIP 코인"
-#     ball-lore: ["&7VIP 전용"]
-machines: {}
-
-# [메시지]
+# 메시지
 messages:
-  created: "&a파칭코 #{id} 설치 완료 (슬롯 {cols})"
-  removed: "&c파칭코 #{id} 삭제 완료"
-  list-title: "&e[파칭코 목록]"
-  need-ball: "&c손에 든 구슬이 조건과 일치하지 않습니다."
-  set-ball: "&a구슬 설정 완료: &f{mat}&7 / 이름: &f{name}&7 / 로어: &f{lore}"
-  set-ball-machine: "&a#{id} 전용 구슬 설정 완료: &f{mat}&7 / 이름: &f{name}&7 / 로어: &f{lore}"
-  start: "&b구슬 투입!"
-  slot-rolling: "&7슬롯 굴림: {a}-{b}-{c}"
-  slot-index-lose: "&7{slot}번 슬롯으로 들어갔습니다. (꽝)"
-  slot-jackpot: "&6잭팟!! LUCKY TIME 진입!"
-  slot-fail: "&7아쉽네요!"
-  center-no-roll: "&7중앙 히트! 하지만 연출은 발생하지 않았습니다."
-  jackpot-broadcast: "&6[파칭코] &e{player}님! #{id}번에서 {reward} 잭팟!! &7(스테이지 {stage}/{max}, 천장 {cap}개)"
-  stageup-broadcast: "&d[파칭코] {player}님, 스테이지 {stage}/{max} 진입! 더 큰 보상이 기다립니다!"
-  lucky-status: "&e[스테이지 {stage}/{max}] &f지급 {paid}/{cap} &7(남은 {remain})"
-  lucky-finish: "&d럭키 타임 종료! 총 지급: {total}"
-  give-ok: "&a{player}에게 구슬 {amount}개 지급"
-  give-no-player: "&c해당 플레이어를 찾을 수 없습니다."
+  stage-announce: "&6&l[파칭코] &e{player}&f님이 &d스테이지 {stage}&f(/{max})에 진입! 더 큰 보상을 향해!"
+  slot-line: "&7슬롯: &f[{a}] &7- &f[{b}] &7- &f[{c}]"
+  lucky-status: "&e{stage}/{max} &7단계 | &b지급합계: &f{paid} &7/ &b맥시멈: &f{cap} &7(남음 {remain})"
+
+# 스테이지 목록(BGM). 원하는 만큼 추가/삭제 가능.
+# 이미 서버에 커스텀 단계를 사용 중이면 이 섹션을 그대로 유지하세요.
+stages:
+  - name: "STAGE 1"
+    bgm: [ "UI_TOAST_CHALLENGE_COMPLETE" ]
+  - name: "STAGE 2"
+    bgm: [ "ENTITY_PLAYER_LEVELUP" ]
+  - name: "STAGE 3"
+    bgm: [ "MUSIC_DISC_MALL" ]
+
+# 설치한 머신 목록은 자동으로 여기 machines로 저장/로드 됩니다.
+machines: []

@@ -11,7 +11,7 @@ public class MachineRegistry {
     private final Main plugin;
     private final Map<Integer, Machine> map = new LinkedHashMap<Integer, Machine>();
 
-    public MachineRegistry(Main p){ this.plugin = p; }
+    public MachineRegistry(Main plugin){ this.plugin = plugin; }
     public Main plugin(){ return plugin; }
 
     public Collection<Machine> all(){ return map.values(); }
@@ -26,13 +26,14 @@ public class MachineRegistry {
 
     public int addWithCols(Location base, int cols){
         int id = nextId();
-        Machine m = new Machine(id, base, plugin.getConfig().getInt("structure.rows", 8), cols);
-        // load default per-machine overrides from global ball settings
+        int rows = plugin.getConfig().getInt("structure.rows", 8);
+        Machine m = new Machine(id, base.clone(), rows, cols);
+        // default per-machine ball from global
         m.ballItem = plugin.getBallMaterial().name();
         String nm = plugin.getBallName();
-        m.ballName = (nm==null ? null : nm);
+        m.ballName = (nm==null? null : nm);
         java.util.List<String> lore = plugin.getBallLore();
-        m.ballLore = (lore==null? null : new ArrayList<String>(lore));
+        m.ballLore = (lore==null || lore.isEmpty()) ? null : new ArrayList<String>(lore);
         map.put(id, m);
         m.build(this);
         return id;
@@ -65,13 +66,12 @@ public class MachineRegistry {
                 double z=Double.parseDouble(sp[3]);
                 int rows = Integer.parseInt(sp[4]);
                 int cols = Integer.parseInt(sp[5]);
-                Machine m = new Machine(id, base, plugin.getConfig().getInt("structure.rows", 8), cols);
-                m.ballItem = ms.getString("ball-item", null);
-                m.ballName = ms.getString("ball-name", null);
                 java.util.List<String> lore = ms.getStringList("ball-lore");
-                m.ballLore = (lore==null || lore.isEmpty()) ? null : new ArrayList<String>(lore);
+                Machine m = new Machine(id, new Location(w,x,y,z), rows, cols,
+                        ms.getString("ball-item", null),
+                        ms.getString("ball-name", null),
+                        (lore==null||lore.isEmpty()?null:lore));
                 map.put(id, m);
-                // do not build on load; assume world already has structure
             }catch(Exception ignored){}
         }
     }
@@ -96,8 +96,9 @@ public class MachineRegistry {
         for (Machine m : all()){
             try{ m.updateSignLines(this); }catch(Throwable ignored){}
         }
-    
-    // convenience config readers
+    }
+
+    // convenience config readers for Machine
     public String cfgStr(String path){
         return plugin.getConfig().getString(path);
     }
@@ -111,7 +112,10 @@ public class MachineRegistry {
             String[] sp = s.split(",");
             if (sp.length>=3){
                 try{
-                    return new int[]{Integer.parseInt(sp[0].trim()), Integer.parseInt(sp[1].trim()), Integer.parseInt(sp[2].trim())};
+                    int a = Integer.parseInt(sp[0].trim());
+                    int b = Integer.parseInt(sp[1].trim());
+                    int c = Integer.parseInt(sp[2].trim());
+                    return new int[]{a,b,c};
                 }catch(Exception ignored){}
             }
         }

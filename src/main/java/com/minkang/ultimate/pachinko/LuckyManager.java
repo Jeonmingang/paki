@@ -127,7 +127,6 @@ public class LuckyManager {
                 stages.add(sc);
             }
         }
-        applySimpleProbabilityOverride(cfg);
     }
 
     
@@ -248,7 +247,6 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
         for (String pa : pfx){
             try{ s.player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(pa), at, 40, 0.3,0.3,0.3,0.01);}catch(Exception ignored){}
         }
-        applySimpleProbabilityOverride(cfg);
     }
 
     private void stepContinueOrEnd(Session s){
@@ -279,7 +277,6 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
             stopAllMusic(p, s.lastMusicKey);
             p.sendMessage(plugin.getConfig().getString("messages.lucky-finish").replace("{total}", String.valueOf(s.paidTotal)).replace("&","§"));
         }
-        applySimpleProbabilityOverride(cfg);
     }
 
     public void onCenterDuringLucky(Player p, Machine m){
@@ -290,7 +287,7 @@ private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stag
             s.cap += add;
             s.remaining += add;
             try{
-                String title = plugin.getConfig().getString("lucky.title-capup","&a천장 +{amount}!").replace("{amount}", String.valueOf(add)).replace("&","§");
+                String title = plugin.getConfig().getString("lucky.title-cap-plus","&a천장 +{amount}!").replace("{amount}", String.valueOf(add)).replace("&","§");
                 p.sendTitle(title, subStatus(s), 5, 30, 5);
                 p.playSound(p.getLocation(), Sound.BLOCK_PISTON_EXTEND, 1.0f, 0.9f);
             }catch(Exception ignored){}

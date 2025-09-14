@@ -88,4 +88,63 @@ public class Main extends JavaPlugin {
     public void updateAllSigns(){
         try{ registry.refreshSigns(); }catch(Exception ignored){}
     }
+
+    // ===== Per-machine / global ball helpers =====
+    public org.bukkit.inventory.ItemStack createBallItemWith(Machine m, int amount){
+        org.bukkit.Material mat = getBallMaterial(m);
+        org.bukkit.inventory.ItemStack it = new org.bukkit.inventory.ItemStack(mat, Math.max(1, amount));
+        org.bukkit.inventory.meta.ItemMeta meta = it.getItemMeta();
+        if (meta != null){
+            String nm = getBallName(m);
+            java.util.List<String> lr = getBallLore(m);
+            if (nm != null) meta.setDisplayName(nm);
+            if (lr != null && !lr.isEmpty()) meta.setLore(new java.util.ArrayList<String>(lr));
+            it.setItemMeta(meta);
+        }
+        return it;
+    }
+    public boolean isBallItemForMachine(org.bukkit.inventory.ItemStack item, Machine m){
+        if (item == null || item.getType() == org.bukkit.Material.AIR) return false;
+        org.bukkit.Material want = getBallMaterial(m);
+        if (item.getType() != want) return false;
+        String wantName = getBallName(m);
+        java.util.List<String> wantLore = getBallLore(m);
+        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        if (wantName != null){
+            if (meta == null || !meta.hasDisplayName()) return false;
+            if (!wantName.equals(meta.getDisplayName())) return false;
+        }
+        if (wantLore != null && !wantLore.isEmpty()){
+            if (meta == null || !meta.hasLore()) return false;
+            java.util.List<String> got = meta.getLore();
+            if (got == null || !got.equals(wantLore)) return false;
+        }
+        return true;
+    }
+    public org.bukkit.Material getBallMaterial(Machine m){
+        if (m != null && m.ballItem != null){
+            org.bukkit.Material mm = org.bukkit.Material.matchMaterial(m.ballItem);
+            if (mm != null) return mm;
+        }
+        return getBallMaterial();
+    }
+    public String getBallName(Machine m){
+        if (m != null && m.ballName != null) return m.ballName;
+        return getBallName();
+    }
+    public java.util.List<String> getBallLore(Machine m){
+        if (m != null && m.ballLore != null) return m.ballLore;
+        return getBallLore();
+    }
+    public boolean canInsertNow(java.util.UUID uuid){
+        long now = System.currentTimeMillis();
+        long cd = getConfig().getLong("anti-spam.insert-cooldown-ms", 300L);
+        Long last = lastInsert.get(uuid);
+        if (last == null || now - last >= cd){
+            lastInsert.put(uuid, now);
+            return true;
+        }
+        return false;
+    }
+    
 }

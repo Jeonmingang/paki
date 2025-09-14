@@ -31,7 +31,7 @@ public class UiListener implements Listener {
                     return; // 딜레이
                 }
 
-                ItemStack hand = p.getInventory().getItemInMainHand( (hand.getAmount()<=0) ? new org.bukkit.inventory.ItemStack(Material.AIR) : hand );
+                ItemStack hand = p.getInventory().getItemInMainHand()<=0) ? new org.bukkit.inventory.ItemStack(Material.AIR) : hand );
                 if (!plugin.isBallItemForMachine(hand, m)){
                     p.sendMessage(plugin.getConfig().getString("messages.need-ball").replace("&","§"));
                     return;

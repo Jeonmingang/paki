@@ -83,7 +83,6 @@ public class LuckyManager {
             this.player=p; this.machine=m; this.cap=cap;
             this.remaining=cap; this.stage=1; this.paidTotal=0;
         }
-        applySimpleProbabilityOverride(cfg);
     }
 
     public LuckyManager(Main p){

@@ -22,6 +22,43 @@ public class LuckyManager {
     private final Random rnd = new Random();
     private final List<StageCfg> stages = new ArrayList<>();
 
+    // ---- Simple probability override (modes: fallback|override|scale) ----
+    private void applySimpleProbabilityOverride(FileConfiguration cfg){
+        try{
+            // Backward compat: if boolean is used, treat true as "fallback"
+            String mode;
+            if (cfg.isBoolean("probability.simple-mode")){
+                mode = cfg.getBoolean("probability.simple-mode") ? "fallback" : "off";
+            }else{
+                mode = cfg.getString("probability.simple-mode", "fallback");
+            }
+            if (mode==null) mode = "off";
+            mode = mode.toLowerCase(java.util.Locale.ROOT);
+            if ("off".equals(mode)) return;
+
+            int globalJackpot = plugin.getGlobalJackpotPercent();
+            double mult = cfg.getDouble("probability.jackpot-scale", 1.0);
+
+            for (StageCfg sc : stages){
+                if ("override".equals(mode)){
+                    sc.continueChance = globalJackpot;
+                    sc.centerContinueChance = globalJackpot;
+                } else if ("fallback".equals(mode)){
+                    if (sc.continueChance <= 0) sc.continueChance = globalJackpot;
+                    if (sc.centerContinueChance == null || sc.centerContinueChance < 0) sc.centerContinueChance = globalJackpot;
+                } else if ("scale".equals(mode)){
+                    int c1 = (int)Math.round(Math.max(0, Math.min(100, sc.continueChance * mult)));
+                    sc.continueChance = c1;
+                    if (sc.centerContinueChance != null){
+                        int c2 = (int)Math.round(Math.max(0, Math.min(100, sc.centerContinueChance * mult)));
+                        sc.centerContinueChance = c2;
+                    }
+                }
+            }
+        }catch (Throwable ignored){}
+    }
+    
+
     static class StageCfg {
         Integer minPayout; Integer maxPayout;
         Integer cap;              // 고정 cap
@@ -46,6 +83,7 @@ public class LuckyManager {
             this.player=p; this.machine=m; this.cap=cap;
             this.remaining=cap; this.stage=1; this.paidTotal=0;
         }
+        applySimpleProbabilityOverride(cfg);
     }
 
     public LuckyManager(Main p){
@@ -90,9 +128,23 @@ public class LuckyManager {
                 stages.add(sc);
             }
         }
+        applySimpleProbabilityOverride(cfg);
     }
 
-    private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stages.size()-1, s.stage-1))); }
+    
+    // ---- Simple probability override (2 knobs: center-hit in RunBall, jackpot here) ----
+    private void applySimpleProbabilityOverride(){
+        try{
+            boolean simple = plugin.getConfig().getBoolean("probability.simple-mode", true);
+            if (!simple) return;
+            int g = plugin.getGlobalJackpotPercent();
+            for (StageCfg sc : stages){
+                sc.continueChance = g;
+                sc.centerContinueChance = g;
+            }
+        }catch (Throwable ignored){}
+    }
+private StageCfg current(Session s){ return stages.get(Math.max(0, Math.min(stages.size()-1, s.stage-1))); }
     private int maxStages(){ return stages.size(); }
 
     public boolean isInLucky(Player p){ return sessions.containsKey(p.getUniqueId()); }
@@ -197,6 +249,7 @@ public class LuckyManager {
         for (String pa : pfx){
             try{ s.player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(pa), at, 40, 0.3,0.3,0.3,0.01);}catch(Exception ignored){}
         }
+        applySimpleProbabilityOverride(cfg);
     }
 
     private void stepContinueOrEnd(Session s){
@@ -227,6 +280,7 @@ public class LuckyManager {
             stopAllMusic(p, s.lastMusicKey);
             p.sendMessage(plugin.getConfig().getString("messages.lucky-finish").replace("{total}", String.valueOf(s.paidTotal)).replace("&","§"));
         }
+        applySimpleProbabilityOverride(cfg);
     }
 
     public void onCenterDuringLucky(Player p, Machine m){

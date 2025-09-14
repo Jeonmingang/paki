@@ -113,9 +113,15 @@ public class Machine {
         // Sign
         if (reg.plugin().getConfig().getBoolean("structure.sign.enabled", true)){
             Material signMat = Material.matchMaterial(reg.cfgStr("structure.sign.type"));
+            if (signMat == null || !signMat.name().endsWith("_WALL_SIGN")) signMat = Material.OAK_WALL_SIGN;
             if (signMat == null) signMat = Material.OAK_SIGN;
             Location sLoc = getSignLocation(reg);
             sLoc.getBlock().setType(signMat, false);
+            try{
+                org.bukkit.block.data.type.WallSign data = (org.bukkit.block.data.type.WallSign) sLoc.getBlock().getBlockData();
+                data.setFacing(org.bukkit.block.BlockFace.SOUTH);
+                sLoc.getBlock().setBlockData(data, false);
+            }catch(Throwable ignored){}
             org.bukkit.block.Sign sign = (org.bukkit.block.Sign) sLoc.getBlock().getState();
             sign.setLine(0, "§6[파칭코]");
             sign.setLine(1, "§7중앙: §f" + reg.plugin().getGlobalCenterHitPercent() + "%");

@@ -10,6 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class UiListener implements Listener {
     private final Main plugin;
@@ -17,31 +18,20 @@ public class UiListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e){
-        // main hand only (avoid off-hand double fire)
         if (e.getHand() != EquipmentSlot.HAND) return;
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         Block b = e.getClickedBlock();
         if (b == null) return;
 
-        // find which machine's start block was clicked
         for (Machine m : plugin.getRegistry().all()){
             org.bukkit.Location start = m.getStartBlockLocation(plugin.getRegistry());
-            if (start.getWorld() == null || b.getWorld() == null) continue;
+            if (start.getWorld()==null || b.getWorld()==null) continue;
             if (!start.getWorld().equals(b.getWorld())) continue;
-            if (start.getBlockX() == b.getX() && start.getBlockY() == b.getY() && start.getBlockZ() == b.getZ()){
-                // optional: material check
-                Material want = m.getStartBlockMaterial(plugin.getRegistry());
-                if (b.getType() != want) {
-                    // allow even if material changed? we keep strict for now
-                    // continue;
-                }
+            if (start.getBlockX()==b.getX() && start.getBlockY()==b.getY() && start.getBlockZ()==b.getZ()){
                 e.setCancelled(true);
                 Player p = e.getPlayer();
-
-                // anti-spam
                 if (!plugin.canInsertNow(p.getUniqueId())) return;
 
-                // need ball
                 ItemStack hand = p.getInventory().getItemInMainHand();
                 if (!plugin.isBallItemForMachine(hand, m)){
                     String msg = plugin.getConfig().getString("messages.need-ball", "&c구슬을 손에 들어주세요.").replace("&","§");
@@ -58,25 +48,33 @@ public class UiListener implements Listener {
                     p.getInventory().setItemInMainHand(hand);
                 }
 
-                // start sound
-                try {
-                    String key = plugin.getConfig().getString("effects.start-sound", "UI_BUTTON_CLICK");
-                    Sound s = Sound.valueOf(key);
-                    p.playSound(p.getLocation(), s, 0.8f, 1.0f);
-                } catch (Throwable ignored){}
-
-                // start message
-                String startMsg = plugin.getConfig().getString("messages.start", "&a시작!").replace("&","§");
-                p.sendMessage(startMsg);
-
-                // if already in a running lucky session for this machine, delegate click to manager
+                // upward animation (visual only)
                 try{
-                    if (plugin.getLucky().isInLucky(p) && plugin.getLucky().isSessionMachine(p, m)){
-                        plugin.getLucky().handleClick(p, m);
-                    }
+                    ItemStack ghost = plugin.createBallItemWith(m, 1);
+                    final org.bukkit.entity.Item item = p.getWorld().dropItem(start.clone().add(0.5, 1.0, 0.5), ghost);
+                    item.setPickupDelay(32767);
+                    item.setGravity(false);
+                    new BukkitRunnable(){
+                        int ticks=0;
+                        @Override public void run(){
+                            ticks++;
+                            item.teleport(item.getLocation().add(0, 0.22, 0));
+                            if (ticks>=20){
+                                item.remove();
+                                cancel();
+                            }
+                        }
+                    }.runTaskTimer(plugin, 0L, 1L);
                 }catch(Throwable ignored){}
 
-                // slot suspense reveal
+                // start sound & message
+                try {
+                    String key = plugin.getConfig().getString("effects.start-sound", "UI_BUTTON_CLICK");
+                    p.playSound(p.getLocation(), Sound.valueOf(key), 0.8f, 1.0f);
+                } catch (Throwable ignored){}
+                String startMsg = plugin.getConfig().getString("messages.start", "&b구슬 투입!").replace("&","§");
+                p.sendMessage(startMsg);
+
                 new RunBall(plugin, p, m).begin();
                 return;
             }

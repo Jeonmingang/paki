@@ -48,7 +48,7 @@ public class BallRunner {
                 if (t >= durationTicks) {
                     // At target -> remove and simulate insertion into hopper
                     as.remove();
-                    w.playSound(end, Sound.BLOCK_HOPPER_INSERT, 1.0f, 1.0f);
+                    w.playSound(end, Sound.BLOCK_HOPPER_PLACE, 1.0f, 1.0f);
                     cancel();
                 }
             }

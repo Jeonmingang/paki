@@ -73,8 +73,8 @@ public class ReelSpin {
             // Last stage -> Jackpot payout buffer
             int pay = 16 + random.nextInt(16);
             // cap enforcement
-            java.util.List<java.util.Map<?,?>> stages = plugin.getConfig().getMapList("stages");
-            int cap = 128; try { Object o = stages.get(Math.min(Math.max(0,m.getStageIndex()), stages.size()-1)).get("payoutCap"); if (o instanceof Number) cap = ((Number)o).intValue(); } catch(Exception ex){}
+            java.util.List<java.util.Map<?,?>> _stagesCap = plugin.getConfig().getMapList("stages");
+            int cap = 128; try { Object o = _stagesCap.get(Math.min(Math.max(0,m.getStageIndex()), _stagesCap.size()-1)).get("payoutCap"); if (o instanceof Number) cap = ((Number)o).intValue(); } catch(Exception ex){}
             int can = cap - m.getCurrentPayout();
             int give = Math.max(0, Math.min(pay, can));
             if (give>0) m.addPayout(give);

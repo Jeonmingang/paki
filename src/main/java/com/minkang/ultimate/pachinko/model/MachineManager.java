@@ -302,7 +302,7 @@ public class MachineManager {
         try {
             p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.bungee.api.chat.TextComponent(msg));
         } catch (Throwable t) {
-            p.sendActionBar(msg);
+            p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.bungee.api.chat.TextComponent(msg);
         }
     }
     private int addPayoutWithCap(org.bukkit.entity.Player p, Machine m, int amount) {

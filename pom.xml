@@ -5,7 +5,7 @@
 
   <groupId>com.minkang.ultimate</groupId>
   <artifactId>UltimatePachinko</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <name>UltimatePachinko</name>
   <description>7-slot pachinko machine with stages and ranking (1.16.5/Java8)</description>
   <url>https://example.invalid/ultimate-pachinko</url>

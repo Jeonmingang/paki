@@ -297,11 +297,12 @@ public class MachineManager {
         return o==null? "&7(스테이지)" : String.valueOf(o);
     }
     private void showHud(org.bukkit.entity.Player p, Machine m) {
-        if (p==null) return;
-        String msg = com.minkang.ultimate.pachinko.util.Text.color("&b"+stageName(m)+" &7| &f지급:&e"+m.getCurrentPayout()+"&7/&e"+stageCap(m)+" &7| &f추첨:&e"+m.getPendingSpins());
+        if (p == null) return;
+        String msg = com.minkang.ultimate.pachinko.util.Text.color("&b" + stageName(m) + " &7| &f지급:&e" + m.getCurrentPayout() + "&7/&e" + stageCap(m) + " &7| &f추첨:&e" + m.getPendingSpins());
         try {
             p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.bungee.api.chat.TextComponent(msg));
-        } catch (Throwable t) {
+        } catch (Throwable t) { }
+    } catch (Throwable t) {
             p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.bungee.api.chat.TextComponent(msg);
         }
     }

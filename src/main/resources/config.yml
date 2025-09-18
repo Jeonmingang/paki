@@ -1,0 +1,52 @@
+language: "ko"
+
+defaultBall:
+  type: SLIME_BALL
+  name: "&a파칭코 구슬"
+  lore:
+    - "&7이 구슬은 특정 기계에서만 사용됩니다."
+    - "&e이름/로어 모두 일치해야 사용 가능"
+
+# 전역 슬롯 가중치(1~7). 중앙(4) 제외 나머지 꽝. 중앙 확률은 weights[3].
+globalWeights: [14, 14, 14, 6, 14, 14, 14]
+
+# 사이드 보너스: 2,6 슬롯에 들어가면 cap 내에서 추가 지급
+sideBonus:
+  slots: [2, 6]
+  min: 1
+  max: 3
+
+# 스테이지 정의: 이름, BGM, 다음 스테이지 진입 확률, 스테이지별 천장(cap)
+stages:
+  - id: 1
+    name: "&a초급 스테이지"
+    bgmSound: "music_disc.cat"
+    advanceChance: 0.25
+    payoutCap: 64
+  - id: 2
+    name: "&b중급 스테이지"
+    bgmSound: "music_disc.blocks"
+    advanceChance: 0.18
+    payoutCap: 96
+  - id: 3
+    name: "&d고급 스테이지"
+    bgmSound: "music_disc.ward"
+    advanceChance: 0.12
+    payoutCap: 128
+  - id: 4
+    name: "&6레전드 스테이지"
+    bgmSound: "music_disc.pigstep"
+    advanceChance: 0.07
+    payoutCap: 192
+
+centerSlot:
+  maxPendingSpins: 5
+  tripleMatchChance: 0.09
+  deferDraws: true
+
+# HUD: 지급 표시 기준 (claimable=대기 보상 / stageTotal=스테이지 누적)
+hud:
+  countMode: claimable
+
+messages:
+  prefix: "&l&9[PACHINKO]&r "

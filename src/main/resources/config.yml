@@ -1,0 +1,50 @@
+
+language: "ko"
+
+defaultBall:
+  type: SLIME_BALL
+  name: "&a파칭코 구슬"
+  lore:
+    - "&7이 구슬은 특정 기계에서만 사용됩니다."
+    - "&e이름/로어 모두 일치해야 사용 가능"
+
+globalWeights: [14, 14, 14, 6, 14, 14, 14]
+
+sideBonus:
+  slots: [2, 6]
+  min: 1
+  max: 3
+
+stages:
+  - id: 1
+    name: "&a초급 스테이지"
+    bgmSound: "music_disc.cat"
+    advanceChance: 0.25
+    payoutCap: 64
+  - id: 2
+    name: "&b중급 스테이지"
+    bgmSound: "music_disc.blocks"
+    advanceChance: 0.18
+    payoutCap: 96
+  - id: 3
+    name: "&d고급 스테이지"
+    bgmSound: "music_disc.ward"
+    advanceChance: 0.12
+    payoutCap: 128
+  - id: 4
+    name: "&6레전드 스테이지"
+    bgmSound: "music_disc.pigstep"
+    advanceChance: 0.07
+    payoutCap: 192
+
+centerSlot:
+  maxPendingSpins: 5
+  tripleMatchChance: 0.09
+  deferDraws: true
+
+hud:
+  countMode: claimable
+  normalName: "&7일반 모드"
+
+messages:
+  prefix: "&l&9[PACHINKO]&r "

@@ -1,0 +1,291 @@
+
+package com.minkang.ultimate.pachinko.model;
+
+import com.minkang.ultimate.pachinko.data.DataStore;
+import com.minkang.ultimate.pachinko.util.ItemSerializer;
+import com.minkang.ultimate.pachinko.util.Locs;
+import com.minkang.ultimate.pachinko.util.Text;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+
+import java.util.*;
+
+public class MachineManager {
+
+    private final Plugin plugin;
+    private final DataStore store;
+    private final Map<Integer, Machine> machines = new HashMap<>();
+    private final Random random = new Random();
+
+    public MachineManager(Plugin plugin, DataStore store) {
+        this.plugin = plugin;
+        this.store = store;
+    }
+
+    public Map<Integer, Machine> getMachines() { return machines; }
+
+    public void loadMachines() {
+        machines.clear();
+        for (String id : store.getMachineIds()) {
+            Map<String,Object> map = store.loadMachine(id);
+            if (map == null) continue;
+            Location base = Locs.fromString((String)map.get("base"));
+            Machine m = new Machine(Integer.parseInt(id), base);
+            m.setGoldButton(Locs.fromString((String)map.get("gold")));
+            @SuppressWarnings("unchecked")
+            java.util.List<String> hop = (java.util.List<String>) map.get("hoppers");
+            java.util.List<Location> hlocs = new java.util.ArrayList<>();
+            if (hop != null) for (String s : hop) hlocs.add(Locs.fromString(s));
+            m.setHopperLocations(hlocs);
+            String ball64 = (String)map.get("ball");
+            if (ball64 != null) m.setBallItem(ItemSerializer.fromBase64(ball64));
+            @SuppressWarnings("unchecked")
+            java.util.List<Integer> ws = (java.util.List<Integer>)map.get("weights");
+            if (ws != null && ws.size()==7) {
+                int[] arr = new int[7];
+                for (int i=0;i<7;i++) arr[i]=ws.get(i);
+                m.setWeights(arr);
+            }
+            machines.put(m.getId(), m);
+        }
+    }
+
+    public void saveMachines() {
+        for (Machine m : machines.values()) {
+            Map<String,Object> map = new HashMap<>();
+            map.put("base", Locs.toString(m.getBase()));
+            map.put("gold", Locs.toString(m.getGoldButton()));
+            java.util.List<String> hop = new java.util.ArrayList<>();
+            for (Location l : m.getHopperLocations()) hop.add(Locs.toString(l));
+            map.put("hoppers", hop);
+            map.put("weights", Arrays.asList(
+                    m.getWeights()[0],m.getWeights()[1],m.getWeights()[2],m.getWeights()[3],
+                    m.getWeights()[4],m.getWeights()[5],m.getWeights()[6]
+            ));
+            if (m.getBallItem()!=null) map.put("ball", ItemSerializer.toBase64(m.getBallItem()));
+            store.saveMachine(String.valueOf(m.getId()), map);
+        }
+        store.save();
+    }
+
+    public void shutdown() { }
+
+    public Machine installMachine(Player p, int id) {
+        Location base = p.getLocation().getBlock().getLocation();
+        World w = base.getWorld();
+        int x0 = base.getBlockX(), y0 = base.getBlockY(), z0 = base.getBlockZ();
+        for (int y=0;y<10;y++) for (int x=-4;x<=4;x++) w.getBlockAt(x0+x, y0+y, z0).setType(Material.AIR);
+        for (int y=0;y<8;y++) for (int x=-4;x<=4;x++) w.getBlockAt(x0+x, y0+y, z0-1).setType(Material.BRICKS);
+        Block gold = w.getBlockAt(x0, y0, z0); gold.setType(Material.GOLD_BLOCK);
+        w.getBlockAt(x0-2, y0, z0).setType(Material.DIAMOND_BLOCK);
+        w.getBlockAt(x0+2, y0, z0).setType(Material.GOLD_BLOCK);
+        for (int row=1; row<=6; row++) for (int col=-3; col<=3; col++)
+            w.getBlockAt(x0+col, y0+row, z0).setType((row%2==0)?Material.IRON_BARS:Material.GLASS);
+        java.util.List<Location> hopperLocs = new java.util.ArrayList<>();
+        for (int i=-3;i<=3;i++) {
+            Block slab = w.getBlockAt(x0+i, y0+7, z0); slab.setType(Material.SMOOTH_STONE_SLAB);
+            Block hop = w.getBlockAt(x0+i, y0+8, z0); hop.setType(Material.HOPPER);
+            hopperLocs.add(hop.getLocation());
+        }
+        Machine m = new Machine(id, base);
+        m.setGoldButton(gold.getLocation());
+        m.setHopperLocations(hopperLocs);
+        m.setBallItem(defaultBall());
+        machines.put(id, m);
+        saveMachines();
+        Text.msg(p, "&a파칭코 기계 #" + id + " 설치 완료! 중앙 금블럭: 우클릭으로 추첨/보상.");
+        return m;
+    }
+
+    private ItemStack defaultBall() {
+        FileConfiguration cfg = plugin.getConfig();
+        String type = cfg.getString("defaultBall.type", "SLIME_BALL");
+        String name = cfg.getString("defaultBall.name", "&a파칭코 구슬");
+        java.util.List<String> lore = cfg.getStringList("defaultBall.lore");
+        Material mat = Material.matchMaterial(type);
+        if (mat == null) mat = Material.SLIME_BALL;
+        ItemStack it = new ItemStack(mat, 1);
+        ItemMeta meta = it.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(Text.color(name));
+            java.util.List<String> ll = new java.util.ArrayList<>();
+            for (String s : lore) ll.add(Text.color(s));
+            meta.setLore(ll);
+            it.setItemMeta(meta);
+        }
+        return it;
+    }
+
+    public boolean deleteMachine(Player p, int id) {
+        Machine m = machines.remove(id);
+        if (m == null) return false;
+        World w = m.getBase().getWorld();
+        int x0 = m.getBase().getBlockX(), y0 = m.getBase().getBlockY(), z0 = m.getBase().getBlockZ();
+        for (int y=0;y<10;y++) for (int x=-4;x<=4;x++) {
+            Block b = w.getBlockAt(x0+x, y0+y, z0);
+            if (b.getType()!=Material.AIR) b.setType(Material.AIR);
+        }
+        store.removeMachine(String.valueOf(id)); store.save();
+        Text.msg(p, "&c기계 #" + id + " 삭제 완료.");
+        return true;
+    }
+
+    public Machine get(int id) { return machines.get(id); }
+
+    public int chooseSlotWeighted(Machine m) {
+        int[] w = m.getWeights(); int sum = 0; for (int v : w) sum += v;
+        if (sum <= 0) return 4;
+        int r = random.nextInt(sum), acc = 0;
+        for (int i=0;i<7;i++) { acc += w[i]; if (r < acc) return i+1; }
+        return 4;
+    }
+
+    public java.util.Map<?,?> stageMap(Machine m) {
+        java.util.List<java.util.Map<?,?>> list = plugin.getConfig().getMapList("stages");
+        int idx = Math.min(Math.max(0, Math.max(0, m.getStageIndex())), list.size()-1);
+        return list.get(idx);
+    }
+    public int stageCap(Machine m) {
+        Object o = stageMap(m).get("payoutCap");
+        return (o instanceof Number) ? ((Number)o).intValue() : 128;
+    }
+    public String stageName(Machine m) {
+        if (!m.isInStage() || m.getStageIndex() < 0) {
+            return plugin.getConfig().getString("hud.normalName","&7일반 모드");
+        }
+        Object o = stageMap(m).get("name");
+        return o==null? "&7(스테이지)" : String.valueOf(o);
+    }
+    public void showHud(Player p, Machine m) {
+        if (p == null) return;
+        String mode = plugin.getConfig().getString("hud.countMode","claimable");
+        int shown = "stageTotal".equalsIgnoreCase(mode) ? m.getCurrentPayout() : m.getPendingPayout();
+        String msg;
+        if (!m.isInStage() || m.getStageIndex() < 0) {
+            msg = Text.color("&7" + stageName(m) + " &7| &f추첨:&e" + m.getPendingSpins());
+        } else {
+            msg = Text.color("&b" + stageName(m) + " &7| &f지급:&e" + shown + "&7/&e" + stageCap(m) + " &7| &f추첨:&e" + m.getPendingSpins());
+        }
+        try { p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(msg)); } catch (Throwable t) { }
+    }
+    public int addPayoutWithCap(Player p, Machine m, int amount) {
+        if (!m.isInStage()) return 0;
+        int cap = stageCap(m);
+        int can = cap - m.getCurrentPayout();
+        if (can <= 0) { Text.msg(p, "&7해당 스테이지 천장에 도달했습니다. (지급 정지)"); showHud(p, m); return 0; }
+        int give = Math.min(can, Math.max(0, amount));
+        if (give > 0) m.addPayout(give);
+        showHud(p, m);
+        if (m.getCurrentPayout() >= cap) {
+            endStage(p, m, "천장 도달로 스테이지 종료, 초기화됩니다.");
+        }
+        return give;
+    }
+
+    public void endStage(Player p, Machine m, String reason) {
+        Text.msg(p, "&6[스테이지 종료] &7" + reason);
+        m.setInStage(false);
+        m.setStageIndex(-1);
+        m.resetCurrentPayout();
+        m.resetPendingSpins();
+        try { if (p!=null) p.playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.0f); } catch (Throwable t) {}
+        showHud(p, m);
+    }
+
+    public void launchBall(Player actor, Machine m) {
+        int chosen = chooseSlotWeighted(m);
+        new BallRunner(plugin, m, chosen).start();
+        if (chosen == 4) {
+            int max = plugin.getConfig().getInt("centerSlot.maxPendingSpins", 5);
+            m.addPendingSpin(max);
+            Text.msg(actor, "&e중앙 진입! &7추첨 기회가 &b" + m.getPendingSpins() + "&7/" + max + " 로 누적되었습니다.");
+            if (m.isInStage()) { playBgm(actor, currentStageSound(m)); }
+            if (actor!=null) actor.sendTitle(Text.color("&e"+stageName(m)), Text.color("&7추첨기회: &e"+m.getPendingSpins()), 5, 30, 5);
+            showHud(actor, m);
+        } else {
+            java.util.List<Integer> bonusSlots = plugin.getConfig().getIntegerList("sideBonus.slots");
+            if (m.isInStage() && bonusSlots.contains(chosen)) {
+                int min = plugin.getConfig().getInt("sideBonus.min",1);
+                int max = plugin.getConfig().getInt("sideBonus.max",3);
+                int give = min + random.nextInt(Math.max(1, (max - min + 1)));
+                int given = addPayoutWithCap(actor, m, give);
+                Text.msg(actor, "&a보너스! &f슬롯 " + chosen + " &7→ 추가 구슬 &b+" + given + (given<give?" &7(천장으로 감소)":""));
+            } else {
+                Text.msg(actor, "&7슬롯 " + chosen + " (꽝)");
+            }
+        }
+    }
+
+    public void payOutAtDiamond(Player p, Machine m) {
+        int amount = m.takePayoutAll();
+        if (amount <= 0) { Text.msg(p, "&7받을 보상이 없습니다."); return; }
+        ItemStack it = m.getBallItem();
+        if (it == null) { Text.msg(p, "&c이 기계의 구슬 아이템이 설정되지 않았습니다."); return; }
+        Location base = m.getBase();
+        Block drop = base.getWorld().getBlockAt(base.getBlockX()-2, base.getBlockY(), base.getBlockZ());
+        int left = amount;
+        while (left > 0) {
+            int stack = Math.min(64, left);
+            ItemStack give = it.clone(); give.setAmount(stack);
+            base.getWorld().dropItemNaturally(drop.getLocation().add(0.5,1.0,0.5), give);
+            left -= stack;
+        }
+        Text.msg(p, "&a보상 지급: &e" + amount + "개 (다이아블럭에서 배출)");
+    }
+
+    public void payOut(Player p, Machine m) {
+        int amount = m.takePayoutAll();
+        if (amount <= 0) { Text.msg(p, "&7받을 보상이 없습니다."); return; }
+        ItemStack it = m.getBallItem();
+        if (it == null) { Text.msg(p, "&c이 기계의 구슬 아이템이 설정되지 않았습니다."); return; }
+        int left = amount;
+        while (left > 0) {
+            int stack = Math.min(64, left);
+            ItemStack give = it.clone(); give.setAmount(stack);
+            java.util.Map<Integer, ItemStack> remain = p.getInventory().addItem(give);
+            if (!remain.isEmpty()) p.getWorld().dropItemNaturally(p.getLocation(), give);
+            left -= stack;
+        }
+        Text.msg(p, "&a보상 지급: &e" + amount + "개");
+    }
+
+    public void giveMarble(Player sender, org.bukkit.OfflinePlayer target, int amount, Machine m) {
+        if (target == null || m.getBallItem() == null) return;
+        ItemStack it = m.getBallItem().clone(); int left = amount;
+        if (target.isOnline()) {
+            Player tp = target.getPlayer();
+            while (left > 0) {
+                int stack = Math.min(64, left);
+                ItemStack gi = it.clone(); gi.setAmount(stack);
+                java.util.Map<Integer, ItemStack> remain = tp.getInventory().addItem(gi);
+                if (!remain.isEmpty()) tp.getWorld().dropItemNaturally(tp.getLocation(), gi);
+                left -= stack;
+            }
+            Text.msg(tp, "&a관리자로부터 파칭코 구슬 " + amount + "개를 지급받았습니다. (#" + m.getId() + ")");
+        }
+    }
+
+    private String currentStageSound(Machine m) {
+        java.util.List<java.util.Map<?,?>> list = plugin.getConfig().getMapList("stages");
+        int idx = Math.min(Math.max(0, Math.max(0, m.getStageIndex())), list.size()-1);
+        java.util.Map<?,?> st = list.get(idx);
+        Object o = st.get("bgmSound");
+        return (o == null) ? "music_disc.cat" : String.valueOf(o);
+    }
+    private void playBgm(Player p, String sound) {
+        if (p == null) return;
+        try { p.playSound(p.getLocation(), Sound.valueOf(sound.toUpperCase().replace('.', '_')), 1.0f, 1.0f); }
+        catch (IllegalArgumentException e) { p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.2f); }
+    }
+
+    public java.util.List<java.util.Map.Entry<String,Integer>> topWins(int limit) {
+        return store.topWins(limit);
+    }
+}

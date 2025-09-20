@@ -1,0 +1,53 @@
+
+language: "ko"
+
+defaultBall:
+  type: SLIME_BALL
+  name: "&a파칭코 구슬"
+  lore:
+    - "&7이 구슬은 특정 기계에서만 사용됩니다."
+    - "&e이름/로어 모두 일치해야 사용 가능"
+
+# 7개의 슬롯 가중치 (좌→우). 중앙은 인덱스 4
+globalWeights: [14, 14, 14, 6, 14, 14, 14]
+
+# 스테이지 설정 (단계별 BGM/확률/천장)
+stages:
+  - name: "&7(스테이지 없음)"
+    advanceChance: 0.0
+    payoutCap: 0
+  - name: "&e1단계"
+    sound: "BLOCK_BEACON_POWER_SELECT"
+    advanceChance: 0.25
+    payoutCap: 64
+  - name: "&62단계"
+    sound: "BLOCK_BEACON_AMBIENT"
+    advanceChance: 0.18
+    payoutCap: 128
+  - name: "&c최종단계"
+    sound: "MUSIC_DISC_CAT"
+    advanceChance: 0.07
+    payoutCap: 192
+
+centerSlot:
+  # 숫자 3개 일치(트리플) 연출 확률 (0.0~1.0)
+  tripleMatchChance: 0.09
+  # 한 번에 누적해 둔 추첨 회수의 최대치
+  maxPendingSpins: 5
+  # 추첨 연출 속도/간격 (느리게: 숫자가 또렷이 보이도록)
+  spin:
+    digitTickInterval: 3   # 숫자 바뀌는 간격(틱)
+    durationTicks: 60      # 한 번의 연출 총 시간(틱)
+  batchDelayTicks: 60       # 각 추첨 사이 지연(틱)
+
+stage:
+  # 스테이지 상태에서 금블럭 우클릭 시 다이아블럭에서 배출되는 구슬 개수
+  dispenseCountPerClick: 7   # 기본은 천장 홉퍼 수
+
+hud:
+  # claimable(지급 가능량) 또는 stageTotal(스테이지 누적량) 표시
+  countMode: claimable
+  normalName: "&7일반 모드"
+
+messages:
+  prefix: "&l&9[PACHINKO]&r "

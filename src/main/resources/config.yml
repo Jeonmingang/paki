@@ -1,0 +1,103 @@
+language: "ko"
+
+defaultBall:
+  type: SLIME_BALL
+  name: "&a파칭코 구슬"
+  lore:
+    - "&7이 구슬은 특정 기계에서만 사용됩니다."
+    - "&e이름/로어 모두 일치해야 사용 가능"
+
+# 7개의 슬롯 가중치 (좌→우). 중앙은 인덱스 4
+globalWeights: [14, 14, 14, 6, 14, 14, 14]
+
+# 스테이지 설정
+stages:
+  - name: "&7(스테이지 없음)"
+    advanceChance: 0.0
+    tripleMatchChance: 0.09
+    payoutPerHit: 1
+    payoutCap: 64
+    bgm: "BLOCK_NOTE_BLOCK_BIT"
+  - name: "&a스테이지 1"
+    advanceChance: 0.25
+    tripleMatchChance: 0.11
+    payoutPerHit: 2
+    payoutCap: 96
+    bgm: "MUSIC_DISC_CHIRP"
+  - name: "&b스테이지 2"
+    advanceChance: 0.18
+    tripleMatchChance: 0.13
+    payoutPerHit: 3
+    payoutCap: 128
+    bgm: "MUSIC_DISC_CAT"
+  - name: "&d스테이지 3"
+    advanceChance: 0.12
+    tripleMatchChance: 0.15
+    payoutPerHit: 4
+    payoutCap: 160
+    bgm: "MUSIC_DISC_BLOCKS"
+
+centerSlot:
+  tripleMatchChance: 0.09
+  spin:
+    digitTickInterval: 3
+    durationTicks: 60
+  maxPendingSpins: 5
+  coalClickMode: "one"   # 'one' = 1회씩, 'all' = 누적 전부
+
+stageMode:
+  type: "accumulate"      # or "directDraw"
+  accumulate:
+    maxPendingSpins: 5
+
+# 1.3.0 호환 키(없으면 위 키 사용)
+centerEntryBehavior: "accumulate"
+
+goldEject:
+  # 금블럭 우클릭 시 다이아블럭 위치에서 구슬을 드랍으로 배출
+  supplyCount: 5
+
+broadcast:
+  # 스테이지 진입/상승 시 전체 채팅 브로드캐스트
+  enabled: true
+  showMaxBall: true
+
+fever:
+  enabled: true
+  triggerMissStreak: 10   # 연속 미당첨 N회 시 발동
+  spins: 5                # FEVER 지속 스핀 수
+  tripleMultiplier: 2.0   # 트리플 확률 배수
+  bgm: "MUSIC_DISC_PIGSTEP"
+  title: "&c&lFEVER TIME!"
+
+
+stageProgression:
+  advanceOnCenter: true   # 중앙 진입 시 스테이지 상승 확률 적용
+  advanceOnSide: false    # 측면 진입 시 상승 확률 적용 여부
+  # 스테이지 항목에서 advanceOnCenterChance 없으면 advanceChance 사용
+
+payout:
+  mode: "instant"         # "instant"=트리플마다 즉시 드랍, "bank"=누적만 하고 따로 배출
+  broadcastOnTriple: true
+  showCapInBroadcast: true
+
+
+# 일본식 파칭코 유사도 향상 세팅
+jpachinko:
+  kakuhen:                 # 확변(ST)
+    enabled: true
+    spins: 100             # ST 회수
+    chance: "1/60"         # ST 대당첨 확률
+    rateOnJackpot: 0.5     # 잭팟 중 확변 비율(나머지는 시단 또는 일반)
+    bgm: "MUSIC_DISC_STRAD"
+    title: "&c&l확변(ST) 시작!"
+  jidan:                   # 시단(時間短縮)
+    enabled: true
+    spins: 50              # 時短 회수
+    chance: "1/319"        # 時短 대당첨 확률(보통 노말과 동일)
+    bgm: "MUSIC_DISC_WAIT"
+    title: "&b&l시단 시작!"
+  end:
+    toStageIndex: 1        # ST/時短 종료 후 돌아갈 스테이지 인덱스
+
+# 잭팟 확률을 문자열 "1/319" 또는 실수 0.00313 로도 입력 가능하게 허용

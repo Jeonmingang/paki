@@ -1,0 +1,20 @@
+language: "ko"
+
+# 스테이지 구성
+stages:
+  - name: "&a1스테이지"
+    cup: 200
+    advanceChance: "1/3"
+    bgm: "NOTE_BLOCK_PLING"
+  - name: "&a2스테이지"
+    cup: 250
+    advanceChance: "1/4"
+    bgm: "NOTE_BLOCK_PLING"
+  - name: "&a3스테이지"
+    cup: 300
+    advanceChance: "1/5"
+    bgm: "NOTE_BLOCK_PLING"
+
+autoAdvance:
+  enabled: true
+  intervalTicks: 20

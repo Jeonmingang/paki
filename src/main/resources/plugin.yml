@@ -1,7 +1,7 @@
 name: UltimatePachinko
 main: com.minkang.ultimate.pachinko.Main
 version: 1.8.1
-api-version: 1.8.1
+api-version: 1.16
 author: minkang
 commands:
   파칭코:

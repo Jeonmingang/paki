@@ -44,14 +44,3 @@
 ### 2.1.1
 - MachineManager: 제네릭 캡쳐 에러(getOrDefault) 제거, 안전 파싱으로 변경.
 - BgmController: stopSound(SoundCategory) 호출 제거 → 1.16.5 호환 API로 정리.
-
-
-### 2.2.0
-- 금블럭 우클릭 시 **손의 전용구슬이면 '투입'**, 아니면 **지급 버튼**으로 동작.
-- '전용구슬' 인식 기준을 **이름+로어 완전 일치(색코드 무시)**로 강화.
-- 스테이지 '진입' 로직 추가:
-  - 구슬 상승 연출 → `entry.centralChance` 성공 시 **숫자 3개 스핀(Title)** → `entry.matchChance` 일치 시 **스테이지 1 진입**.
-  - 실패 시 `&7[꽝] &f#<좌/우 1칸>` 알림 및 짧은 좌/우 연출.
-- `config.yml` 확장: `entry.centralChance`, `entry.matchChance`, `visuals.entryRiseTicks`, `visuals.stepTicks`.
-- `/파칭코 설치 <id>`: 스크린샷과 유사한 구조물 자동 생성(석탄/금/다이아 + 유리/철창/호퍼).
-- `/파칭코 삭제 <id>`: 레코드 삭제 안내(구조물 삭제는 안전상 자동 수행하지 않음).

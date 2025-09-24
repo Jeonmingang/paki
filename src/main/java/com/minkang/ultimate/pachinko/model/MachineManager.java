@@ -358,7 +358,6 @@ public int chooseSlotWeighted(Machine m){
         }
     }
 
-}
 
     public void enterStage(Machine m, org.bukkit.entity.Player p){
         if (m.isStageActive()) return;
@@ -562,3 +561,5 @@ public int chooseSlotWeighted(Machine m){
             endStage(m, p, "cup 도달");
         }
     }
+
+}

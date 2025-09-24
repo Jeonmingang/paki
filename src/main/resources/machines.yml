@@ -1,0 +1,7 @@
+machines:
+  - id: 1
+    world: bskyblock_world
+    x: 0
+    y: 64
+    z: 0
+    slots: 7

@@ -140,9 +140,12 @@ public class Machine {
         this.payoutRemaining = 0;
         this.lastActor = trigger != null ? trigger.getUniqueId() : null;
 
-        String msg = plugin.getConfig().getString("messages.entryReady", "");
-        if (msg != null && !msg.isEmpty() && trigger != null) {
-            trigger.sendMessage(Text.prefix(plugin) + msg);
+        String msg = plugin.getConfig().getString("messages.entryReady", "")
+                .replace("%player%", trigger != null ? trigger.getName() : "SYSTEM")
+                .replace("%stage%", stages.get(stageIndex).getName())
+                .replace("%id%", String.valueOf(id));
+        if (msg != null && !msg.isEmpty()) {
+            if (trigger != null) trigger.sendMessage(Text.prefix(plugin) + msg);
         }
 
         if (plugin.getConfig().getBoolean("sounds.bgm.enabled", true)) {
@@ -162,6 +165,7 @@ public class Machine {
         }
     }
 
+    
     public void onGoldClicked(Player p) {
         if (state == State.PRE_ENTRY) {
             int max = plugin.getConfig().getInt("chance.maxTickets", 5);
@@ -187,7 +191,6 @@ public class Machine {
             raiseBallVisual();
             return;
         }
-
         if (state == State.IN_STAGE) {
             ItemStack hand = p.getInventory().getItemInMainHand();
             if (!acceptsBall(hand)) {
@@ -199,91 +202,70 @@ public class Machine {
                 return;
             }
             this.lastActor = p.getUniqueId();
-            doThreeDigitDraw(false, p,
-                new Runnable(){ public void run(){
-                    stageIndex++;
-                    String msg = plugin.getConfig().getString("messages.advanceWin", "다음 스테이지로 상승");
-                    if (p != null) p.sendMessage(Text.prefix(plugin) + msg);
-                    if (stageIndex >= stages.size()) { endStage(true); }
-                    else {
-                        String msg2 = plugin.getConfig().getString("messages.enterStage", "")
-                                .replace("%stage%", stages.get(stageIndex).getName());
-                        if (p != null && msg2 != null && !msg2.isEmpty()) p.sendMessage(Text.prefix(plugin) + msg2);
-                    }
-                }},
-                new Runnable(){ public void run(){
-                    String msg = plugin.getConfig().getString("messages.advanceFail", "불일치! 배출 단계로 전환됩니다.");
-                    if (p != null) p.sendMessage(Text.prefix(plugin) + msg);
-                    startPayout();
-                }}
-            );
+            doThreeDigitDraw(false, p);
             return;
         }
     }
 
     public void onCoalClicked(Player p) {
         if (state != State.PRE_ENTRY) {
-            // 스테이지 진입 후에는 석탄블럭은 잠시 필요 없음
             return;
         }
-        int max = plugin.getConfig().getInt("chance.maxTickets", 5);
         if (drawTickets <= 0) {
             p.sendMessage(Text.prefix(plugin) + "추첨권이 없습니다.");
             return;
         }
-        if (drawTickets >= max) {
-            final int attempts = drawTickets;
-            drawTickets = 0; // 한번에 소비(자동 연속 추첨)
-            runEntryDrawsSequential(p, attempts);
+        drawTickets = 0; // 하나만 시도하고 리셋
+        this.lastActor = p.getUniqueId();
+        doThreeDigitDraw(true, p);
+    }
+
+    public void onCoalClicked(Player p) {
+        if (state != State.IN_STAGE) return;
+        if (drawTickets <= 0) {
+            p.sendMessage(Text.prefix(plugin) + "추첨권이 없습니다.");
+            return;
+        }
+        int toUse = drawTickets;
+        drawTickets = 0;
+
+        String msg = plugin.getConfig().getString("messages.drawStart", "")
+                .replace("%count%", String.valueOf(toUse));
+        p.sendMessage(Text.prefix(plugin) + msg);
+
+        boolean advanced = false;
+        for (int i = 0; i < toUse; i++) {
+            if (tryAdvance()) {
+                advanced = true;
+                break;
+            }
+        }
+        if (advanced) {
+            stageIndex++;
+            if (stageIndex >= stages.size()) {
+                endStage(true);
+            } else {
+                p.sendMessage(Text.prefix(plugin) + plugin.getConfig().getString("messages.drawWin", ""));
+                String msg2 = plugin.getConfig().getString("messages.enterStage", "")
+                        .replace("%stage%", stages.get(stageIndex).getName());
+                p.sendMessage(Text.prefix(plugin) + msg2);
+            }
         } else {
-            drawTickets -= 1;
-            doThreeDigitDraw(true, p,
-                new Runnable(){ public void run(){ // 성공 → IN_STAGE 진입
-                    state = State.IN_STAGE;
-                    String msg = plugin.getConfig().getString("messages.entryWin", "스테이지 진입");
-                    if (p != null) p.sendMessage(Text.prefix(plugin) + msg);
-                    String bc = plugin.getConfig().getString("messages.broadcastEnter", "")
-                            .replace("%player%", p != null ? p.getName() : "SYSTEM")
-                            .replace("%stage%", stages.get(stageIndex).getName())
-                            .replace("%id%", String.valueOf(id));
-                    if (bc != null && !bc.isEmpty()) Bukkit.broadcastMessage(Text.prefix(plugin) + bc);
-                }},
-                new Runnable(){ public void run(){ // 실패 → 수동으로 다시 시도
-                    String msg = plugin.getConfig().getString("messages.entryFail", "불일치! 다시 모아서 시도하세요.");
-                    if (p != null) p.sendMessage(Text.prefix(plugin) + msg);
-                }}
-            );
+            p.sendMessage(Text.prefix(plugin) + plugin.getConfig().getString("messages.drawFail", ""));
+            startPayout();
         }
     }
 
-    // 연속 추첨(티켓이 가득 찼을 때 자동 5연 등)
-    private void runEntryDrawsSequential(final Player actor, final int attemptsRemaining) {
-        if (attemptsRemaining <= 0 || state != State.PRE_ENTRY) return;
-        doThreeDigitDraw(true, actor,
-            new Runnable(){ public void run(){ // 성공 → IN_STAGE 진입
-                state = State.IN_STAGE;
-                String msg = plugin.getConfig().getString("messages.entryWin", "스테이지 진입");
-                if (actor != null) actor.sendMessage(Text.prefix(plugin) + msg);
-                String bc = plugin.getConfig().getString("messages.broadcastEnter", "")
-                        .replace("%player%", actor != null ? actor.getName() : "SYSTEM")
-                        .replace("%stage%", stages.get(stageIndex).getName())
-                        .replace("%id%", String.valueOf(id));
-                if (bc != null && !bc.isEmpty()) Bukkit.broadcastMessage(Text.prefix(plugin) + bc);
-            }},
-            new Runnable(){ public void run(){ // 실패 → 남은 횟수로 이어서 재시도
-                int left = attemptsRemaining - 1;
-                if (left > 0) {
-                    runEntryDrawsSequential(actor, left);
-                } else {
-                    String msg = plugin.getConfig().getString("messages.entryFail", "불일치! 다시 모아서 시도하세요.");
-                    if (actor != null) actor.sendMessage(Text.prefix(plugin) + msg);
-                }
-            }}
-        );
+    private boolean tryAdvance() {
+        Stage st = stages.get(stageIndex);
+        double chance = st.getAdvanceChance();
+        double r = Math.random();
+        return r < chance;
     }
 
-    // ---- 3-digit draw animation with callbacks ----
-    private void doThreeDigitDraw(final boolean isEntry, final Player actor, final Runnable onSuccess, final Runnable onFail) {
+    
+    // ---- 3-digit draw animation & result ----
+    private void doThreeDigitDraw(final boolean isEntry, final Player actor) {
         final int steps = Math.max(1, plugin.getConfig().getInt("draw.spinSteps", 10));
         final int tick = Math.max(1, plugin.getConfig().getInt("draw.spinTick", 2));
         final Stage st = stages.get(stageIndex);
@@ -317,16 +299,42 @@ public class Machine {
                 for (Player pl : Bukkit.getOnlinePlayers()) pl.sendTitle(title, "", 0, 20, 10);
 
                 if (success) {
-                    if (onSuccess != null) onSuccess.run();
+                    if (isEntry) {
+                        state = State.IN_STAGE;
+                        String msg = plugin.getConfig().getString("messages.entryWin", "스테이지 진입");
+                        if (actor != null) actor.sendMessage(Text.prefix(plugin) + msg);
+                        String bc = plugin.getConfig().getString("messages.broadcastEnter", "")
+                                .replace("%player%", actor != null ? actor.getName() : "SYSTEM")
+                                .replace("%stage%", stages.get(stageIndex).getName())
+                                .replace("%id%", String.valueOf(id));
+                        if (bc != null && !bc.isEmpty()) Bukkit.broadcastMessage(Text.prefix(plugin) + bc);
+                    } else {
+                        stageIndex++;
+                        String msg = plugin.getConfig().getString("messages.advanceWin", "다음 스테이지로 상승");
+                        if (actor != null) actor.sendMessage(Text.prefix(plugin) + msg);
+                        if (stageIndex >= stages.size()) {
+                            endStage(true);
+                        } else {
+                            String msg2 = plugin.getConfig().getString("messages.enterStage", "")
+                                    .replace("%stage%", stages.get(stageIndex).getName());
+                            if (actor != null && msg2 != null && !msg2.isEmpty()) actor.sendMessage(Text.prefix(plugin) + msg2);
+                        }
+                    }
                 } else {
-                    if (onFail != null) onFail.run();
+                    if (isEntry) {
+                        String msg = plugin.getConfig().getString("messages.entryFail", "불일치! 다시 모아서 시도하세요.");
+                        if (actor != null) actor.sendMessage(Text.prefix(plugin) + msg);
+                    } else {
+                        String msg = plugin.getConfig().getString("messages.advanceFail", "불일치! 배출 단계로 전환됩니다.");
+                        if (actor != null) actor.sendMessage(Text.prefix(plugin) + msg);
+                        startPayout();
+                    }
                 }
                 cancel();
             }
         }.runTaskTimer(plugin, 0L, tick);
     }
-
-    private void startPayout() {
+private void startPayout() {
         final Stage st = stages.get(stageIndex);
         this.payoutRemaining = st.getCup();
         this.state = State.PAYOUT;
@@ -371,7 +379,9 @@ public class Machine {
                 .replace("%cup%", String.valueOf(st.getCup()))
                 .replace("%id%", String.valueOf(id))
                 .replace("%player%", lastActor != null ? Bukkit.getOfflinePlayer(lastActor).getName() : "SYSTEM");
-        Bukkit.broadcastMessage(Text.prefix(plugin) + msg);
+        if (msg != null && !msg.isEmpty()) {
+            if (trigger != null) trigger.sendMessage(Text.prefix(plugin) + msg);
+        }
 
         this.state = State.IDLE;
         this.stageIndex = -1;

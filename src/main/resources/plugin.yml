@@ -1,6 +1,6 @@
 name: UltimatePachinko
 main: com.minkang.ultimate.pachinko.Main
-version: 2.9.3
+version: 2.9.0
 api-version: 1.16
 authors: [MinKang]
 commands:

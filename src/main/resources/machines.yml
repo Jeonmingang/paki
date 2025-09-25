@@ -12,11 +12,9 @@ machines: []
 #       lock: false
 #     stages:
 #       list:
-#         - name: "Stage 1"
-#           cup: 126
-#           entryChance: 0.20   # 석탄 3자리 '진입' 확률
-#           advanceChance: 0.40 # 금블럭 3자리 '상승' 확률
-#         - name: "Stage 2"
-#           cup: 223
-#           entryChance: 0.20
-#           advanceChance: 0.30
+#         - { name: "Stage 1", cup: 126, entryChance: 0.20
+#           ↑ 석탄 3자리 진입확률
+#           ↓ 금블럭 3자리 상승확률
+          advanceChance: 0.40 }
+#         - { name: "Stage 2", cup: 223, entryChance: 0.20
+          advanceChance: 0.30 }

@@ -1,0 +1,18 @@
+machines: []
+# 샘플 (참고용)
+# machines:
+#   - id: 1
+#     world: bskyblock_world
+#     base:
+#       x: 0
+#       y: 64
+#       z: 0
+#     facing: SOUTH
+#     stages:
+#       list:
+#         - name: "Stage 1"
+#           cup: 126
+#           advanceChance: 0.40
+#         - name: "Stage 2"
+#           cup: 223
+#           advanceChance: 0.30

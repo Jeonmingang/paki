@@ -1,0 +1,52 @@
+settings:
+  entryMatchChance: 0.01
+  spinDurationTicks: 40
+  digitsPerSecond: 20
+  allowSneakInsertAll: true
+  width: 9
+  height: 7
+  rewardLaunchVelocity: 0.35
+  tokensMax: 5
+  machineLockSeconds: 15
+  allowBroadcasts: true
+  rankingSize: 10
+ui:
+  actionbarTokensFormat: "&6추첨권 &f{tokens}&7/&f{max}"
+  payoutTitleMain: "&e배출 &6{current} &7/&f {cup}"
+  payoutTitleSub: ""
+  capReachedTitle: "&a상한선 도달!"
+  capReachedSub: "&7업그레이드에 도전해 보세요!"
+  spinTitleFormat: "&f{a} &7| &f{b} &7| &f{c}"
+  spinSuccessTitle: "&a&l성공!"
+  spinFailTitle: "&c&l실패"
+  enterTitle: "&a스테이지 진입! &e{stage}"
+  upgradeSuccessTitle: "&a업그레이드 성공! &e스테이지 {stage}"
+  upgradeFailTitle: "&c업그레이드 실패"
+  lockDeny: "&c다른 플레이어가 사용 중입니다: &f{player}"
+  hopperEnterFormat: "&7상단 {side}{offset}호퍼에 흡수됨 (&f#{index}&7/&f{width})"
+  hopperSideLeft: "좌측 "
+  hopperSideRight: "우측 "
+  hopperSideCenter: "정중앙 "
+  hopperOffsetFormat: "{n}번 "
+  hopperOnlyWhenNotCenter: true
+  hopperActionbar: true
+broadcast:
+  enabled: true
+  enter: "&b[파칭코] &f{player}&7 님이 &e스테이지 {stage}&7 에 진입했습니다! &6★"
+  upgradeLevels:
+    1: "&b[파칭코] &f{player}&7 님, &e스테이지 {stage}&7 달성! &6★"
+    2: "&d[파칭코] &f{player}&7 님이 &e스테이지 {stage}&7 로 상승!! &6★★"
+    3: "&c[파칭코] &l전설 탄생! &r&f{player}&7 님 &e스테이지 {stage}&7 !!! &6★★★"
+  sound: "UI_TOAST_CHALLENGE_COMPLETE"
+defaultStages:
+  - cup: 30
+    upgradeChance: 35.0
+    payoutBurst: 3
+  - cup: 50
+    upgradeChance: 25.0
+    payoutBurst: 3
+  - cup: 80
+    upgradeChance: 10.0
+    payoutBurst: 5
+machines: {}
+ranking: {}

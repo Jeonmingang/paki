@@ -1,19 +1,9 @@
-# UltimatePachinko 2.0.0
 
-요구사항에 맞춰 다음을 구현했습니다.
+# UltimatePachinko v2.12.1
 
-- 구슬 1개씩만 이동 + 이징(easeInOutQuad)
-- 1틱 스케줄러 위치 보간, drawingNow 게이트
-- 중앙 실패 시 채팅 알림
-- BGM 중복 방지 (stopSound → playSound)
-- 스테이지 자동 중앙 추첨(석탄 불필요), 주기 config화
-- 다이아 블럭=배출구, 금블럭=지급 버튼
-- 축하 브로드캐스트 + 랭킹(/파칭코 랭킹)
+- 새 옵션: **중앙이 아닌 호퍼로 들어간 경우** 어디로 들어갔는지 표시
+  - `ui.hopperEnterFormat`, `ui.hopperSide*`, `ui.hopperOffsetFormat`
+  - `ui.hopperOnlyWhenNotCenter`(true일 때 중앙이면 숨김), `ui.hopperActionbar`(액션바 표기)
+- 나머지 기능은 v2.12.0과 동일
 
-## 빠른 테스트
-1) `machines.yml`의 위치를 서버 환경에 맞게 조정
-2) 서버 실행 후 `/파칭코 목록` 확인
-3) 기계 주변에서 스테이지 진입 → 자동 중앙 추첨 동작 확인
-4) 금블럭 우클릭으로 지급, 다이아 블럭에서 배출 이펙트 확인
-5) `/파칭코 랭킹` 확인
-
+빌드: `mvn clean package`

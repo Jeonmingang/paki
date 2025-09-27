@@ -1,0 +1,72 @@
+# UltimatePachinkoPlus 기본 설정
+ball:
+  material: SLIME_BALL
+  display-name: "§b구슬"
+machine:
+  height: 6
+  ascend-ticks: 2            # 낮을수록 빠름
+  show-into-hopper: true     # 호퍼로 빨려들어가는 연출
+  max-simultaneous-balls: 12
+  require-exclusive-ball: true
+draw:
+  max-tokens: 5              # 중앙 적립 최대치
+  match-probability: 0.10    # 3개 일치 확률(0~1)
+  spin:
+    total-ticks: 80
+    first-stop: 40
+    second-stop: 60
+probability:
+  base:
+    lane:
+      left: 0.33
+      center: 0.34
+      right: 0.33
+stages:
+  # 원하는 만큼 스테이지를 추가/삭제하고 각 확률을 수정하세요.
+  # id는 1부터. enter-broadcast/up-broadcast 는 Placeholder %player% %stage% %from% %to% 사용가능
+  - id: 1
+    name: "STAGE 1"
+    cup: 50
+    next-stage-chance: 0.20
+    lane:
+      left: 0.33
+      center: 0.34
+      right: 0.33
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입했습니다!"
+    up-broadcast: "&6%player% 님이 &b스테이지 %from% &7→ &d%to% &6로 승급!"
+  - id: 2
+    name: "STAGE 2"
+    cup: 70
+    next-stage-chance: 0.15
+    lane:
+      left: 0.32
+      center: 0.36
+      right: 0.32
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입했습니다!"
+    up-broadcast: "&6%player% 님이 &b스테이지 %from% &7→ &d%to% &6로 승급!"
+  - id: 3
+    name: "STAGE 3"
+    cup: 90
+    next-stage-chance: 0.12
+    lane:
+      left: 0.31
+      center: 0.38
+      right: 0.31
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입했습니다!"
+    up-broadcast: "&6%player% 님이 &b스테이지 %from% &7→ &d%to% &6로 승급!"
+messages:
+  prefix: "&7[&bPachinko&7] "
+  need-token: "&c전용 구슬이 필요합니다! &7(/파칭코 설정 구슬 <기계번호> 로 설정)"
+  in-use: "&c해당 파칭코는 현재 %player% 님이 사용중입니다."
+  taken-over: "&7이제 이 파칭코를 사용합니다."
+  lane-left: "&7좌측에 들어감"
+  lane-right: "&7우측에 들어감"
+  lane-center: "&a중앙! &f추첨 &e%cur%/%max%"
+  draw-start: "&b추첨 시작!"
+  draw-fail: "&c아쉽지만 꽝..."
+  stage-enter: "&a스테이지 %stage% 진입!"
+  stage-up: "&6스테이지 %from% → %to% 승급!"
+  stage-bust: "&c스테이지 실패! 기존 상태로 초기화"
+  ranking-header: "&e=== 파칭코 랭킹 상위 %n% ==="
+  ranking-line: "&6%idx%. &f%name% &7- &b%score%&7 회"
+  ranking-empty: "&7아직 기록이 없습니다."

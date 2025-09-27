@@ -1,0 +1,14 @@
+name: UltimatePachinkoPlus
+main: com.example.pachinko.PachinkoPlugin
+version: 1.0.0
+api-version: 1.16
+author: ChatGPT
+commands:
+  파칭코:
+    description: 파칭코 관리자/플레이 명령어
+    usage: /<command> [설치|설정|랭킹|리로드|나가기] ...
+    aliases: [pachinko, pach]
+permissions:
+  pachinko.admin:
+    default: op
+    description: 파칭코 관리자 권한

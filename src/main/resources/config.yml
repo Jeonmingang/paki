@@ -1,0 +1,45 @@
+ball:
+  material: SLIME_BALL
+  display-name: "§b구슬"
+machine:
+  height: 6
+  ascend-ticks: 2
+  show-into-hopper: true
+  max-simultaneous-balls: 12
+  require-exclusive-ball: true
+draw:
+  max-tokens: 5
+  match-probability: 0.10
+  spin:
+    total-ticks: 80
+    first-stop: 40
+    second-stop: 60
+probability:
+  base:
+    lane:
+      left: 0.33
+      center: 0.34
+      right: 0.33
+stages:
+  - id: 1
+    name: "STAGE 1"
+    cup: 50
+    next-stage-chance: 0.20
+    lane:
+      left: 0.33
+      center: 0.34
+      right: 0.33
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
+  - id: 2
+    name: "STAGE 2"
+    cup: 70
+    next-stage-chance: 0.15
+    lane:
+      left: 0.32
+      center: 0.36
+      right: 0.32
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
+ranking:
+  top-n: 10

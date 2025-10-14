@@ -12,9 +12,7 @@ import java.util.*;
 
 public class MachineManager {
     private final org.bukkit.plugin.Plugin plugin;
-
-
-    private final PachinkoPlugin plugin;
+private final PachinkoPlugin plugin;
     private final Map<Integer, Machine> machines = new HashMap<>();
     private final File file;
     private YamlConfiguration y;

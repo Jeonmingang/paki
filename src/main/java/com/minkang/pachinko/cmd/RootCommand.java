@@ -1,5 +1,7 @@
 package com.minkang.pachinko.cmd;
 
+import com.minkang.pachinko.game.Settings;
+
 import com.minkang.pachinko.PachinkoPlugin;
 import com.minkang.pachinko.game.Machine;
 import org.bukkit.Bukkit;

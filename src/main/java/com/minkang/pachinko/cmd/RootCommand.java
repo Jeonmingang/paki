@@ -43,7 +43,7 @@ public class RootCommand implements CommandExecutor, TabCompleter {
             int id;
             try { id = Integer.parseInt(args[1]); } catch (Exception e) { sender.sendMessage(ChatColor.RED+"번호는 정수"); return true; }
             Player p = (Player) sender;
-            Machine m = plugin.getMachineManager().createTemplate(id, p);
+            Machine m = plugin.getMachineManager().createTemplate(p, id, plugin.getSettings());
             if (m == null) sender.sendMessage(ChatColor.RED+"이미 존재하는 번호입니다.");
             else sender.sendMessage(ChatColor.GREEN+"파칭코 #"+id+" 설치 완료.");
             return true;

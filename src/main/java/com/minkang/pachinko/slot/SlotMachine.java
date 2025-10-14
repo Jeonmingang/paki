@@ -167,3 +167,19 @@ public class SlotMachine {
         return s.getSymbols().get(s.getSymbols().size()-1).name;
     }
 }
+
+    public static SlotMachine from(org.bukkit.configuration.file.YamlConfiguration y, int id) {
+        String p = "slots."+id+".";
+        try {
+            String[] b = (""+y.get(p+"base")).split(",");
+            String[] l = (""+y.get(p+"lever")).split(",");
+            if (b.length<4 || l.length<4) return null;
+            org.bukkit.World wb = org.bukkit.Bukkit.getWorld(b[0]);
+            org.bukkit.World wl = org.bukkit.Bukkit.getWorld(l[0]);
+            if (wb==null || wl==null) return null;
+            org.bukkit.Location base = new org.bukkit.Location(wb, Integer.parseInt(b[1]), Integer.parseInt(b[2]), Integer.parseInt(b[3]));
+            org.bukkit.Location lever = new org.bukkit.Location(wl, Integer.parseInt(l[1]), Integer.parseInt(l[2]), Integer.parseInt(l[3]));
+            return new SlotMachine(id, base, lever);
+        } catch (Exception e) { return null; }
+    }
+    

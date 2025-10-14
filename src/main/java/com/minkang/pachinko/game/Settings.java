@@ -65,8 +65,10 @@ public class Settings {
                                              mat(rs.getString("inner", innerMaterial.name()))));
                 } else if (o instanceof java.util.Map){
                     java.util.Map<?,?> map=(java.util.Map<?,?>)o;
-                    String e=String.valueOf(map.getOrDefault("edge", edgeMaterial.name()));
-                    String i=String.valueOf(map.getOrDefault("inner", innerMaterial.name()));
+                    Object ev = map.containsKey("edge") ? map.get("edge") : edgeMaterial.name();
+                    String e = String.valueOf(ev);
+                    Object iv = map.containsKey("inner") ? map.get("inner") : innerMaterial.name();
+                    String i = String.valueOf(iv);
                     rowMaterials.add(new Row(mat(e), mat(i)));
                 }
             }
@@ -163,6 +165,8 @@ public class Settings {
     public Material materialForRowLane(int y, int laneIndex0to6){
         return (laneIndex0to6==3)? innerForY(y) : edgeForY(y);
     }
+    public Material materialForY(int y){ return edgeForY(y); }
+
     public boolean hasRowUniform(){ return !rowMaterials.isEmpty(); }
     public boolean hasMatrix(){ return false; }
 

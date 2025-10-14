@@ -166,9 +166,8 @@ public class SlotMachine {
         }
         return s.getSymbols().get(s.getSymbols().size()-1).name;
     }
-}
-
-    public static SlotMachine from(org.bukkit.configuration.file.YamlConfiguration y, int id) {
+    
+        public static SlotMachine from(org.bukkit.configuration.file.YamlConfiguration y, int id) {
         String p = "slots."+id+".";
         try {
             String[] b = (""+y.get(p+"base")).split(",");
@@ -182,4 +181,6 @@ public class SlotMachine {
             return new SlotMachine(id, base, lever);
         } catch (Exception e) { return null; }
     }
-    
+
+
+}

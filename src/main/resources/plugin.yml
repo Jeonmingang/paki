@@ -1,6 +1,6 @@
 name: Pachinko
 main: com.minkang.pachinko.PachinkoPlugin
-version: 1.3.7a-patch
+version: 1.3.3
 api-version: 1.16
 commands:
   파칭코:

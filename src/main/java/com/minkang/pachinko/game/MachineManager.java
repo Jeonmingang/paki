@@ -11,14 +11,14 @@ import java.io.IOException;
 import java.util.*;
 
 public class MachineManager {
-    private final org.bukkit.plugin.Plugin plugin;
-private final PachinkoPlugin plugin;
+    private final PachinkoPlugin plugin;
     private final Map<Integer, Machine> machines = new HashMap<>();
     private final File file;
     private YamlConfiguration y;
 
     public MachineManager(PachinkoPlugin plugin) {
-        this.plugin = com.minkang.pachinko.PachinkoPlugin.get();
+        
+        this.plugin = plugin;this.plugin = com.minkang.pachinko.PachinkoPlugin.get();
         new org.bukkit.scheduler.BukkitRunnable(){ public void run(){
             int t = com.minkang.pachinko.PachinkoPlugin.get().getSettings().getIdleTimeoutSeconds();
             for (Machine m : machines.values()) m.checkIdleTimeout(t);

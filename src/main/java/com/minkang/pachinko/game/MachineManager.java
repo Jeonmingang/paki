@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class MachineManager {
-    private final com.minkang.pachinko.PachinkoPlugin plugin;
-    private final PachinkoPlugin plugin;
+        private final com.minkang.pachinko.PachinkoPlugin plugin;
+
+
     private final Map<Integer, Machine> machines = new HashMap<>();
     private final File file;
     private YamlConfiguration y;

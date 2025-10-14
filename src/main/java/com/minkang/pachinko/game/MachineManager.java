@@ -57,49 +57,73 @@ public class MachineManager {
         return null;
     }
 
-    public Machine createTemplate(int id, Player p) {
-        if (machines.containsKey(id)) return null;
-        World w = p.getWorld();
-        Settings s = PachinkoPlugin.get().getSettings();
+    
+    // Helper: yaw -> cardinal BlockFace
+    private org.bukkit.block.BlockFace faceFromYaw(float yaw) {
+        yaw = (yaw % 360 + 360) % 360;
+        if (yaw >= 45 && yaw < 135) return org.bukkit.block.BlockFace.WEST;
+        if (yaw >= 135 && yaw < 225) return org.bukkit.block.BlockFace.NORTH;
+        if (yaw >= 225 && yaw < 315) return org.bukkit.block.BlockFace.EAST;
+        return org.bukkit.block.BlockFace.SOUTH;
+    }
 
-        Vector dir = p.getLocation().getDirection().setY(0).normalize();
-        if (dir.lengthSquared() < 0.01) dir = new Vector(0,0,1);
-        Vector right = new Vector(-dir.getZ(), 0, dir.getX());
+    public Machine createTemplate(org.bukkit.entity.Player p, int id, Settings s) {
+        org.bukkit.World w = p.getWorld();
+        org.bukkit.block.BlockFace f = faceFromYaw(p.getLocation().getYaw());
 
-        Location center = p.getLocation().getBlock().getLocation().add(dir.multiply(3)); // front of player
+        int fx=0,fz=0, rx=0,rz=0;
+        switch (f) {
+            case NORTH: fx=0; fz=-1; rx=1;  rz=0;  break;
+            case SOUTH: fx=0; fz=1;  rx=-1; rz=0;  break;
+            case EAST:  fx=1; fz=0;  rx=0;  rz=1;  break;
+            case WEST:  fx=-1;fz=0;  rx=0;  rz=-1; break;
+            default: fx=0; fz=1; rx=-1; rz=0; break;
+        }
 
-        // Floor triggers: left=COAL, center=GOLD, right=DIAMOND
-        Location gold = center.clone();
-        Location coal = center.clone().add(right.clone().multiply(-1));
-        Location diamond = center.clone().add(right.clone().multiply(1));
-        gold.getBlock().setType(Material.GOLD_BLOCK);
-        coal.getBlock().setType(Material.COAL_BLOCK);
-        diamond.getBlock().setType(Material.DIAMOND_BLOCK);
+        org.bukkit.Location pl = p.getLocation();
+        int baseX = pl.getBlockX() + fx*3;
+        int baseY = pl.getBlockY();
+        int baseZ = pl.getBlockZ() + fz*3;
 
-        // 7 lanes columns (-3..+3), glass on edges, iron bars internal
-        int h = Math.max(4, s.getHeight());
-        Location[] hs = new Location[7];
-        for (int i=-3;i<=3;i++) {
-            for (int y=1;y<=h;y++) {
-                Location col = center.clone().add(right.clone().multiply(i)).add(0, y, 0);
-                Material m = s.hasRowUniform() ? s.materialForY(y) : ((i==-3 || i==3) ? s.edgeForY(y) : s.innerForY(y));
-                col.getBlock().setType(m);
+        // floor blocks & bases
+        org.bukkit.Location coal = new org.bukkit.Location(w, baseX + rx*-1, baseY, baseZ + rz*-1);
+        org.bukkit.Location gold = new org.bukkit.Location(w, baseX,            baseY, baseZ);
+        org.bukkit.Location diamond = new org.bukkit.Location(w, baseX + rx*1,  baseY, baseZ + rz*1);
+        w.getBlockAt(coal).setType(org.bukkit.Material.COAL_BLOCK);
+        w.getBlockAt(gold).setType(org.bukkit.Material.GOLD_BLOCK);
+        w.getBlockAt(diamond).setType(org.bukkit.Material.DIAMOND_BLOCK);
+
+        // top 7 hoppers in a straight line + locations
+        int hopperY = baseY + s.getHeight() + 1;
+        org.bukkit.Location[] hs = new org.bukkit.Location[7];
+        for (int i=-3; i<=3; i++) {
+            org.bukkit.Location hp = new org.bukkit.Location(w, baseX + rx*i, hopperY, baseZ + rz*i);
+            w.getBlockAt(hp).setType(org.bukkit.Material.HOPPER);
+            hs[i+3] = hp;
+        }
+
+        // columns
+        for (int i=-3; i<=3; i++) {
+            for (int y=1; y<=s.getHeight(); y++) {
+                org.bukkit.Material mat;
+                if (s.hasMatrix()) {
+                    org.bukkit.Material mm = s.materialForRowLane(y, i+3);
+                    mat = (mm != null) ? mm : ((i==-3 || i==3) ? s.edgeForY(y) : s.innerForY(y));
+                } else if (s.hasRowUniform()) {
+                    mat = s.materialForY(y);
+                } else {
+                    mat = (i==-3 || i==3) ? s.edgeForY(y) : s.innerForY(y);
+                }
+                w.getBlockAt(baseX + rx*i, baseY + y, baseZ + rz*i).setType(mat);
             }
         }
 
-        // Hoppers on top of each lane
-        for (int i=-3;i<=3;i++) {
-            Location hp = center.clone().add(right.clone().multiply(i)).add(0, h+1, 0);
-            hp.getBlock().setType(Material.HOPPER);
-            hs[i+3] = hp;
-        }
-        // Indicator block above center hopper
-        Location indicator = hs[3].clone().add(0, 1, 0);
-        indicator.getBlock().setType(Material.STONE_BRICKS);
+        // indicator: 중심 위쪽 한 칸
+        org.bukkit.Location indicator = new org.bukkit.Location(w, gold.getBlockX(), baseY + s.getHeight() + 2, gold.getBlockZ());
 
         Machine m = new Machine(id, coal, gold, diamond, hs, indicator);
         machines.put(id, m);
-        saveAll();
         return m;
     }
+
 }

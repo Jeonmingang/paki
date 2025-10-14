@@ -1,0 +1,14 @@
+name: Pachinko
+main: com.minkang.pachinko.PachinkoPlugin
+version: 1.3.7a
+api-version: 1.16
+commands:
+  파칭코:
+    description: 파칭코 시스템
+    usage: /파칭코 <설치|설정|리로드|랭킹|나가기>
+  슬롯:
+    description: 슬롯머신 시스템
+    usage: /슬롯 <설치|아이템|리로드|나가기>
+permissions:
+  pachinko.admin:
+    default: op

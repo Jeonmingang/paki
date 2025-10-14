@@ -1,0 +1,100 @@
+ball:
+  material: SLIME_BALL
+  display-name: "§b구슬"
+
+machine:
+
+columns:
+  edge-material: GLASS
+  inner-material: IRON_BARS
+
+rows:                # 아래에서부터 1층, 2층, 3층... 순서로 적용 (생략 시 기본값 사용)
+  - { edge: GLASS, inner: IRON_BARS }
+  - { edge: GLASS, inner: IRON_BARS }
+  - { edge: GLASS, inner: IRON_BARS }
+
+  height: 6
+  ascend-ticks: 2
+  show-into-hopper: true
+  max-simultaneous-balls: 12
+  require-exclusive-ball: true
+  idle-timeout-seconds: 120
+
+draw:
+  max-tokens: 5
+  auto-consume: true
+  auto-consume-delay-ticks: 20
+  match-probability: 0.006
+  spin:
+    total-ticks: 80
+    first-stop: 40
+    second-stop: 60
+
+probability:
+  base:
+    # 7레인(왼쪽→오른쪽) 확률합 = 1.0
+    lanes: [0.18, 0.17, 0.14, 0.04, 0.14, 0.17, 0.16]
+
+visual:
+  deposit-into-hopper: false
+
+hud:
+  bossbar:
+    enabled: true
+
+fx:
+  reach:
+    enabled: true
+    title: "&eREACH!"
+  win:
+    title: "&6당첨!"
+  burst:
+    title: "&c버스트!"
+
+stages:
+  - id: 1
+    name: "스테이지 1"
+    cup: 60
+    next-stage-chance: 0.65
+    lanes: [0.16, 0.16, 0.15, 0.06, 0.15, 0.16, 0.16]
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
+  - id: 2
+    name: "스테이지 2"
+    cup: 80
+    next-stage-chance: 0.40
+    lanes: [0.15, 0.15, 0.16, 0.08, 0.16, 0.15, 0.15]
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
+  - id: 3
+    name: "스테이지 3"
+    cup: 100
+    next-stage-chance: 0.25
+    lanes: [0.14, 0.14, 0.17, 0.10, 0.17, 0.14, 0.14]
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
+
+slot:
+  spin:
+    total-ticks: 80
+    first-stop: 40
+    second-stop: 60
+  cost-item:
+    material: GOLD_NUGGET
+    display-name: "§6코인"
+  cost-per-spin: 1
+  payout:
+    three-of-a-kind:
+      SEVEN: 64
+      BAR: 32
+      BELL: 16
+      GRAPE: 8
+      CHERRY: 4
+    two-of-a-kind:
+      CHERRY: 2
+  symbols:
+    - { name: SEVEN,  display: "7",    weight: 1 }
+    - { name: BAR,    display: "BAR",  weight: 2 }
+    - { name: BELL,   display: "Bell", weight: 4 }
+    - { name: GRAPE,  display: "Grape",weight: 6 }
+    - { name: CHERRY, display: "Cherry",weight: 8 }

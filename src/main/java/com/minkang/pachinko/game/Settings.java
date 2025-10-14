@@ -96,7 +96,7 @@ public class Settings {
                 if (o instanceof ConfigurationSection){
                     stages.add(readStage((ConfigurationSection) o));
                 } else if (o instanceof java.util.Map){
-                    org.bukkit.configuration.MemorySection sec = new org.bukkit.configuration.MemorySection(null,"");
+                    org.bukkit.configuration.MemorySection sec = new org.bukkit.configuration.file.YamlConfiguration().createSection("tmp");
                     for (java.util.Map.Entry<?,?> e: ((java.util.Map<?,?>)o).entrySet()) sec.set(String.valueOf(e.getKey()), e.getValue());
                     stages.add(readStage(sec));
                 }

@@ -27,6 +27,7 @@ public class Machine {
     private Location indicator;
 
     private UUID occupant;
+    private long lastBallTime = 0L;
     private long lastAction;
     private int tokens;
     private boolean spinning;
@@ -111,6 +112,7 @@ public class Machine {
     }
 
     public void onClickGold(Player p, Settings s) {
+        this.lastBallTime = System.currentTimeMillis();
         if (!assignIfFree(p)) { p.sendMessage(ChatColor.RED+"다른 플레이어가 사용 중입니다."); return; }
         touch();
 
@@ -259,4 +261,21 @@ public class Machine {
         PachinkoPlugin.get().getRankingManager().recordBurst(p.getUniqueId(), dropCount);
         release();
     }
+
+    private void announceLane(org.bukkit.entity.Player p, int laneIndex) {
+        // 1~7 기준 중앙=4
+        String side = (laneIndex < 4) ? "왼쪽" : (laneIndex > 4 ? "오른쪽" : "중앙");
+        p.sendMessage("§7" + laneIndex + "번 슬롯(" + side + ")에 들어감");
+    }
+    
+
+    public void checkIdleTimeout(int timeoutSeconds) {
+        if (occupant == null) return;
+        long now = System.currentTimeMillis();
+        if (lastBallTime == 0L) lastBallTime = now; // set on first occupy
+        if ((now - lastBallTime) >= timeoutSeconds * 1000L) {
+            occupant = null;
+        }
+    }
+    
 }

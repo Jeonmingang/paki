@@ -3,16 +3,16 @@ ball:
   display-name: "§b구슬"
 
 machine:
-
-columns:
-  edge-material: GLASS
-  inner-material: IRON_BARS
-
-rows:                # 아래에서부터 1층, 2층, 3층... 순서로 적용 (생략 시 기본값 사용)
-  - { edge: GLASS, inner: IRON_BARS }
-  - { edge: GLASS, inner: IRON_BARS }
-  - { edge: GLASS, inner: IRON_BARS }
-
+  columns:
+    edge-material: GLASS
+    inner-material: IRON_BARS
+    rows:                # 아래(1층) → 위로
+      - edge: GLASS
+        inner: IRON_BARS
+      - edge: GLASS
+        inner: IRON_BARS
+      - edge: GLASS
+        inner: IRON_BARS
   height: 6
   ascend-ticks: 2
   show-into-hopper: true
@@ -32,7 +32,7 @@ draw:
 
 probability:
   base:
-    # 7레인(왼쪽→오른쪽) 확률합 = 1.0
+    # 7레인(왼→오) 합 = 1.0
     lanes: [0.18, 0.17, 0.14, 0.04, 0.14, 0.17, 0.16]
 
 visual:
@@ -93,8 +93,18 @@ slot:
     two-of-a-kind:
       CHERRY: 2
   symbols:
-    - { name: SEVEN,  display: "7",    weight: 1 }
-    - { name: BAR,    display: "BAR",  weight: 2 }
-    - { name: BELL,   display: "Bell", weight: 4 }
-    - { name: GRAPE,  display: "Grape",weight: 6 }
-    - { name: CHERRY, display: "Cherry",weight: 8 }
+    - name: SEVEN
+      display: "7"
+      weight: 1
+    - name: BAR
+      display: "BAR"
+      weight: 2
+    - name: BELL
+      display: "Bell"
+      weight: 4
+    - name: GRAPE
+      display: "Grape"
+      weight: 6
+    - name: CHERRY
+      display: "Cherry"
+      weight: 8

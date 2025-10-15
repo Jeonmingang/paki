@@ -1,33 +1,30 @@
+
 package com.minkang.pachinko.util;
 
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Base64;
 
 public class ItemSerializer {
-
-    public static String itemToBase64(ItemStack item) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
-        dataOutput.writeObject(item);
-        dataOutput.close();
-        return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+    public static String toBase64(ItemStack item){
+        try{
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(item);
+            oos.close();
+            return Base64.getEncoder().encodeToString(baos.toByteArray());
+        }catch(Exception e){ return null; }
     }
-
-    public static ItemStack itemFromBase64(String data) throws IOException {
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(data));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            ItemStack item = (ItemStack) dataInput.readObject();
-            dataInput.close();
-            return item;
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Unable to decode class type.", e);
-        }
+    public static ItemStack fromBase64(String b64){
+        try{
+            byte[] data = Base64.getDecoder().decode(b64);
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+            Object obj = ois.readObject();
+            ois.close();
+            return (ItemStack) obj;
+        }catch(Exception e){ return null; }
     }
 }

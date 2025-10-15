@@ -209,4 +209,8 @@ public class Settings {
         return (float) cfg.getDouble("fx.insert-sound.pitch", 1.4D);
     }
     
+
+    public double getDrawMatchProbability(){
+        return cfg.getDouble("draw.match-probability", 0.06D);
+    }
 }

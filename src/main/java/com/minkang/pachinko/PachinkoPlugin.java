@@ -13,6 +13,7 @@ public class PachinkoPlugin extends JavaPlugin {
 
     private static PachinkoPlugin instance;
     public static PachinkoPlugin getInstance(){ return instance; }
+    public static PachinkoPlugin get(){ return instance; }
 
     private Settings settings;
     private MachineManager machines;
@@ -24,9 +25,9 @@ public class PachinkoPlugin extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         this.settings = new Settings(getConfig());
-        this.machines = new MachineManager(this, settings);
-        this.ranking = new RankingManager(this);
-        this.slots    = new SlotManager(this, settings);
+        this.machines = new MachineManager(this);
+        this.ranking = new RankingManager(getDataFolder());
+        this.slots    = new SlotManager(this);
 
         getServer().getPluginManager().registerEvents(
                 new InteractListener(machines, settings, ranking, slots), this);
@@ -44,6 +45,17 @@ public class PachinkoPlugin extends JavaPlugin {
 
     public Settings getSettings(){ return settings; }
     public MachineManager getMachines(){ return machines; }
+    public MachineManager getMachineManager(){ return machines; }
     public RankingManager getRanking(){ return ranking; }
+    public RankingManager getRankingManager(){ return ranking; }
     public SlotManager getSlots(){ return slots; }
+    public SlotManager getSlotManager(){ return slots; }
+
+    public void reloadAll(){
+        reloadConfig();
+        this.settings = new Settings(getConfig());
+        this.machines.reload();
+        if (this.slots != null) this.slots.reload();
+    }
+
 }

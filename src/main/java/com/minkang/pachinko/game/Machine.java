@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class Machine {
-    private void showTokenBar(org.bukkit.entity.Player p){
+    private void showTokenBar(org.bukkit.entity.Player p, Settings s){
         p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-            new net.md_5.bungee.api.chat.TextComponent(com.minkang.pachinko.util.Text.color("&b추첨 &f"+tokens+"/"+/*FIXME_MAXTOKENS*/0)));
+            new net.md_5.bungee.api.chat.TextComponent(com.minkang.pachinko.util.Text.color("&b추첨 &f"+tokens+"/"+s.getMaxTokens())));
     }
 
 
@@ -35,7 +35,9 @@ public class Machine {
     private long lastBallTime = 0L;
     private long lastAction;
     private int tokens;
-    private boolean spinning;
+    
+    public int getTokens(){ return tokens; }
+private boolean spinning;
     private int stage; // 0 = idle, >=1 = stage
     private int dropCount; // per stage
     private boolean upgraded; // whether at least one upgrade happened in this stage
@@ -184,8 +186,8 @@ public class Machine {
     private void onBallArrive(Player p, Settings s, int lane) {
         if (lane==3) {
             if (stage==0) {
-                tokens = Math.min(/*FIXME_MAXTOKENS*/0, tokens+1);
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&b중앙! 추첨 &f"+tokens+"/"+/*FIXME_MAXTOKENS*/0)));
+                tokens = Math.min(s.getMaxTokens(), tokens+1);
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&b중앙! 추첨 &f"+tokens+"/"+s.getMaxTokens())));
                 // immediate entry chance on center (stage 0)
                 if (Math.random() < s.getEntryChanceOnCenter()) {
                     stage = 1; dropCount=0; upgraded=false;

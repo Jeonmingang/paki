@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class Machine {
+    private void showTokenBar(org.bukkit.entity.Player p){
+        p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+            new net.md_5.bungee.api.chat.TextComponent(com.minkang.pachinko.util.Text.color("&b추첨 &f"+tokens+"/"+s.getMaxTokens())));
+    }
+
 
     private final int id;
     private final World world;

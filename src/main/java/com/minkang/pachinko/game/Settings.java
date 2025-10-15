@@ -185,4 +185,28 @@ public class Settings {
         return cfg.getInt("draw.auto-consume-delay-ticks", 20);
     }
 
+
+
+    public boolean isInsertSoundEnabled(){
+        return cfg.getBoolean("fx.insert-sound.enabled", true);
+    }
+    
+
+
+    public String getInsertSoundName(){
+        return cfg.getString("fx.insert-sound.name", "ENTITY_EXPERIENCE_ORB_PICKUP");
+    }
+    
+
+
+    public float getInsertSoundVolume(){
+        return (float) cfg.getDouble("fx.insert-sound.volume", 0.8D);
+    }
+    
+
+
+    public float getInsertSoundPitch(){
+        return (float) cfg.getDouble("fx.insert-sound.pitch", 1.4D);
+    }
+    
 }

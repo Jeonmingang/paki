@@ -112,3 +112,9 @@ slot:
 
 draw:
   entry-chance-on-center: 0.10  # 중앙 적중 시 스테이지1 즉시 진입 확률(스테이지0에서만)
+fx:
+  insert-sound:
+    enabled: true
+    name: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.8
+    pitch: 1.4

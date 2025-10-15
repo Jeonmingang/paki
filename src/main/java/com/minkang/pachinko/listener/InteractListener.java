@@ -41,6 +41,7 @@ public class InteractListener implements Listener {
         }
 
         if (type != Material.GOLD_BLOCK && type != Material.COAL_BLOCK && type != Material.DIAMOND_BLOCK) return;
+            playSoundInsert(p);
 
         Machine m = machines.getByBlock(b.getLocation());
         if (m == null) return;
@@ -52,4 +53,17 @@ public class InteractListener implements Listener {
         else if (type == Material.COAL_BLOCK) m.onClickCoal(p, settings);
         else m.onClickDiamond(p, settings, ranking);
     }
+
+
+    private void playSoundInsert(org.bukkit.entity.Player p){
+        try{
+            com.minkang.pachinko.game.Settings s = plugin.getSettings();
+            if (!s.isInsertSoundEnabled()) return;
+            org.bukkit.Sound sd = org.bukkit.Sound.valueOf(s.getInsertSoundName());
+            p.playSound(p.getLocation(), sd, s.getInsertSoundVolume(), s.getInsertSoundPitch());
+        }catch (IllegalArgumentException ex){
+            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.8f, 1.4f);
+        }
+    }
+        
 }

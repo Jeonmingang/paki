@@ -70,7 +70,7 @@ private boolean spinning;
         y.set(p+"indicator", toString(indicator));
         try {
             if (exclusiveBall != null) y.set(p+"exclusiveBall", ItemSerializer.toBase64(exclusiveBall));
-        } catch (IOException ignored) {}
+        } catch (Exception ignored) {}
     }
 
     public static Machine from(YamlConfiguration y, int id) {
@@ -84,7 +84,7 @@ private boolean spinning;
         Location ind = fromString(y.getString(p+"indicator"));
         Machine m = new Machine(id, coal, gold, diamond, hs, ind);
         if (y.contains(p+"exclusiveBall")) {
-            try { m.exclusiveBall = ItemSerializer.fromBase64(y.getString(p+"exclusiveBall")); } catch (IOException ignored) {}
+            try { m.exclusiveBall = ItemSerializer.fromBase64(y.getString(p+"exclusiveBall")); } catch (Exception ignored) {}
         }
         return m;
     }

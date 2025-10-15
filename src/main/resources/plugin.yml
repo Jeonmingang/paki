@@ -1,27 +1,18 @@
 name: Pachinko
 main: com.minkang.pachinko.PachinkoPlugin
-version: 1.3.9-R18
+version: 1.3.4
 api-version: 1.16
-authors: [minkang]
-description: Pachinko & Slot machines (commands + alias hotfix)
-
-# IMPORTANT: we register ASCII command keys (pachinko/slot) and attach Korean aliases.
-# This avoids some servers failing to register non-ASCII primary command names.
+author: minkang
 commands:
-  pachinko:
-    aliases: [파칭코, paki]
-    description: Pachinko root command
-    usage: "/파칭코 <설치|삭제|목록|설정|리로드|랭킹> ..."
-    permission: pachinko.use
-
-  slot:
-    aliases: [슬롯]
-    description: Slot machine root command
-    usage: "/슬롯 <설치|삭제|목록|설정|리로드> ..."
-    permission: pachinko.use
-
+  파칭코:
+    description: 파칭코 루트 명령어
+    usage: "/파칭코 <설치|목록|삭제|설정|리로드|랭킹>"
+    aliases: [pachinko, pach, 파칭]
+    permission: pachinko.admin
+  슬롯:
+    description: 슬롯머신 루트 명령어
+    usage: "/슬롯 <설치|목록|삭제|설정|리로드>"
+    aliases: [slot]
 permissions:
-  pachinko.use:
-    default: true
   pachinko.admin:
     default: op

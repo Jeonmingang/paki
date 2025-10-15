@@ -1,13 +1,14 @@
 name: Pachinko
 main: com.minkang.pachinko.PachinkoPlugin
-version: 1.4.0
+version: 1.4.1
 api-version: "1.16"
 authors: [ "minkang" ]
 
+# 핵심: ASCII 기반 커맨드 이름 -> 한글은 alias로 제공
 commands:
-  파칭코:
+  pachinko:
     description: 파칭코 관리 및 플레이
-    aliases: [ pachinko ]
+    aliases: [ "파칭코" ]
     usage: |
       /파칭코 설치 <번호>
       /파칭코 설정 구슬 <번호>
@@ -15,15 +16,17 @@ commands:
       /파칭코 랭킹
       /파칭코 목록
       /파칭코 삭제 <번호>
-  슬롯:
+    permission: pachinko.use
+  slot:
     description: 슬롯머신 관리 및 플레이
-    aliases: [ slot, 슬롯머신 ]
+    aliases: [ "슬롯", "슬롯머신" ]
     usage: |
       /슬롯 설치 <번호>
       /슬롯 아이템 <번호>
       /슬롯 리로드
       /슬롯 목록
       /슬롯 삭제 <번호>
+    permission: pachinko.use
 
 permissions:
   pachinko.admin:

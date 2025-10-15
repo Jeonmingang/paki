@@ -181,6 +181,13 @@ public class Machine {
             if (stage==0) {
                 tokens = Math.min(s.getMaxTokens(), tokens+1);
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&b중앙! 추첨 &f"+tokens+"/"+s.getMaxTokens())));
+                // immediate entry chance on center (stage 0)
+                if (Math.random() < s.getEntryChanceOnCenter()) {
+                    stage = 1; dropCount=0; upgraded=false;
+                    Settings.Stage stEnter = s.getStages().get(0);
+                    Bukkit.broadcastMessage(Text.color(stEnter.enterBroadcast.replace("%player%", p.getName()).replace("%stage%", String.valueOf(stage))));
+                    p.sendTitle(Text.color(s.getFxWinTitle()), "", 10, 40, 10);
+                }
                 if (s.isAutoConsume()) {
                     Bukkit.getScheduler().runTaskLater(PachinkoPlugin.get(), () -> onClickCoal(p, s), s.getAutoConsumeDelay());
                 }
@@ -206,7 +213,7 @@ public class Machine {
             }
         } else {
             String side = lane<3? "좌측" : "우측";
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&7"+side+" 슬롯에 들어감")));
+            p.sendMessage(Text.color("&7#"+(lane+1)+" 슬롯(호퍼)에 들어감"));
         }
     }
 
@@ -233,7 +240,7 @@ public class Machine {
                 if (t==stop1) s1=true;
                 if (t==stop2) s2=true;
 
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&f[ &d"+a+" &f| &d"+b+" &f| &d"+c+" &f]")));
+                p.sendTitle(Text.color("&f&l"+a+" &7| &f&l"+b+" &7| &f&l"+c), "", 0, 10, 0);
 
                 if (t>=total) {
                     spinning=false;

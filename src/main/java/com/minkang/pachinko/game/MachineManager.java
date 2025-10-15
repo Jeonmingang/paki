@@ -132,16 +132,4 @@ new org.bukkit.scheduler.BukkitRunnable(){ public void run(){
         machines.put(id, m);
         return m;
     }
-
-
-
-    private void runQueuedDraws(org.bukkit.entity.Player p){
-        org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            PlayerState ps = states.get(p.getUniqueId());
-            if (ps == null) return;
-            if (ps.tokens <= 0 || ps.state != GameState.DRAW_READY) return;
-            startDraw(p); // will consume exactly 1 token
-        }, s.getAutoConsumeDelayTicks());
-    }
-
 }

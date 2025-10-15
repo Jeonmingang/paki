@@ -2,10 +2,7 @@
 package com.minkang.pachinko.util;
 
 import org.bukkit.inventory.ItemStack;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.Base64;
 
 public class ItemSerializer {
@@ -27,4 +24,7 @@ public class ItemSerializer {
             return (ItemStack) obj;
         }catch(Exception e){ return null; }
     }
+    // 호환용 구 메서드명
+    public static String itemToBase64(ItemStack item){ return toBase64(item); }
+    public static ItemStack itemFromBase64(String b64){ return fromBase64(b64); }
 }

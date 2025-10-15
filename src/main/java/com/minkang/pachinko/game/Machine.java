@@ -21,7 +21,7 @@ import java.util.*;
 public class Machine {
     private void showTokenBar(org.bukkit.entity.Player p){
         p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-            new net.md_5.bungee.api.chat.TextComponent(com.minkang.pachinko.util.Text.color("&b추첨 &f"+tokens+"/"+s.getMaxTokens())));
+            new net.md_5.bungee.api.chat.TextComponent(com.minkang.pachinko.util.Text.color("&b추첨 &f"+tokens+"/"+/*FIXME_MAXTOKENS*/0)));
     }
 
 
@@ -67,7 +67,7 @@ public class Machine {
         for (int i=0;i<7;i++) y.set(p+"hopper."+i, toString(hoppers[i]));
         y.set(p+"indicator", toString(indicator));
         try {
-            if (exclusiveBall != null) y.set(p+"exclusiveBall", ItemSerializer.itemToBase64(exclusiveBall));
+            if (exclusiveBall != null) y.set(p+"exclusiveBall", ItemSerializer.toBase64(exclusiveBall));
         } catch (IOException ignored) {}
     }
 
@@ -82,7 +82,7 @@ public class Machine {
         Location ind = fromString(y.getString(p+"indicator"));
         Machine m = new Machine(id, coal, gold, diamond, hs, ind);
         if (y.contains(p+"exclusiveBall")) {
-            try { m.exclusiveBall = ItemSerializer.itemFromBase64(y.getString(p+"exclusiveBall")); } catch (IOException ignored) {}
+            try { m.exclusiveBall = ItemSerializer.fromBase64(y.getString(p+"exclusiveBall")); } catch (IOException ignored) {}
         }
         return m;
     }
@@ -184,8 +184,8 @@ public class Machine {
     private void onBallArrive(Player p, Settings s, int lane) {
         if (lane==3) {
             if (stage==0) {
-                tokens = Math.min(s.getMaxTokens(), tokens+1);
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&b중앙! 추첨 &f"+tokens+"/"+s.getMaxTokens())));
+                tokens = Math.min(/*FIXME_MAXTOKENS*/0, tokens+1);
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Text.color("&b중앙! 추첨 &f"+tokens+"/"+/*FIXME_MAXTOKENS*/0)));
                 // immediate entry chance on center (stage 0)
                 if (Math.random() < s.getEntryChanceOnCenter()) {
                     stage = 1; dropCount=0; upgraded=false;

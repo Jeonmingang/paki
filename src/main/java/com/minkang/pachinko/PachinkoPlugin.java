@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PachinkoPlugin extends JavaPlugin {
+    private static PachinkoPlugin instance;
+    public static PachinkoPlugin getInstance(){ return instance; }
 
     private static PachinkoPlugin instance;
     private Settings settings;
@@ -23,7 +25,8 @@ public class PachinkoPlugin extends JavaPlugin {
     public com.minkang.pachinko.slot.SlotManager getSlotManager() { return slotManager; }
 
     @Override
-    public void onEnable() {
+    public void onEnable(){
+        instance = this; {
         instance = this;
         saveDefaultConfig();
         settings = new Settings(getConfig());

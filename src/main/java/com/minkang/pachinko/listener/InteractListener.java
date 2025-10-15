@@ -1,9 +1,15 @@
+
 package com.minkang.pachinko.listener;
 
 import com.minkang.pachinko.game.Machine;
 import com.minkang.pachinko.game.MachineManager;
 import com.minkang.pachinko.game.RankingManager;
 import com.minkang.pachinko.game.Settings;
+import com.minkang.pachinko.slot.SlotMachine;
+import com.minkang.pachinko.slot.SlotManager;
+import com.minkang.pachinko.util.Text;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -17,9 +23,9 @@ public class InteractListener implements Listener {
     private final MachineManager machines;
     private final Settings settings;
     private final RankingManager ranking;
-    private final com.minkang.pachinko.slot.SlotManager slotManager;
+    private final SlotManager slotManager;
 
-    public InteractListener(MachineManager machines, Settings settings, RankingManager ranking, com.minkang.pachinko.slot.SlotManager slotManager) {
+    public InteractListener(MachineManager machines, Settings settings, RankingManager ranking, SlotManager slotManager){
         this.machines = machines;
         this.settings = settings;
         this.ranking = ranking;
@@ -27,21 +33,24 @@ public class InteractListener implements Listener {
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
+    public void onInteract(PlayerInteractEvent e){
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         Block b = e.getClickedBlock();
         if (b == null) return;
-        Material type = b.getType();
 
-        // Slot lever
-        if (type == Material.LEVER) {
-            com.minkang.pachinko.slot.SlotMachine sm = slotManager.getByLever(b);
-            if (sm != null) { e.setCancelled(true); sm.onLever(e.getPlayer(), slotManager.getSettings()); }
+        // 슬롯머신 레버
+        if (b.getType() == Material.LEVER){
+            SlotMachine sm = slotManager.getByLever(b);
+            if (sm != null){
+                e.setCancelled(true);
+                sm.onLever(e.getPlayer(), slotManager.getSettings());
+            }
             return;
         }
 
+        // 파칭코 블럭: 금/석탄/다이아
+        Material type = b.getType();
         if (type != Material.GOLD_BLOCK && type != Material.COAL_BLOCK && type != Material.DIAMOND_BLOCK) return;
-            playSoundInsert(p);
 
         Machine m = machines.getByBlock(b.getLocation());
         if (m == null) return;
@@ -49,21 +58,29 @@ public class InteractListener implements Listener {
         Player p = e.getPlayer();
         e.setCancelled(true);
 
-        if (type == Material.GOLD_BLOCK) m.onClickGold(p, settings);
-        else if (type == Material.COAL_BLOCK) m.onClickCoal(p, settings);
-        else m.onClickDiamond(p, settings, ranking);
-    }
-
-
-    private void playSoundInsert(org.bukkit.entity.Player p){
-        try{
-            com.minkang.pachinko.game.Settings s = plugin.getSettings();
-            if (!s.isInsertSoundEnabled()) return;
-            org.bukkit.Sound sd = org.bukkit.Sound.valueOf(s.getInsertSoundName());
-            p.playSound(p.getLocation(), sd, s.getInsertSoundVolume(), s.getInsertSoundPitch());
-        }catch (IllegalArgumentException ex){
-            p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.8f, 1.4f);
+        switch (type){
+            case GOLD_BLOCK:
+                m.onClickGold(p, settings);
+                // 구슬 투입 사운드
+                try{
+                    if (settings.isInsertSoundEnabled()){
+                        org.bukkit.Sound sd = org.bukkit.Sound.valueOf(settings.getInsertSoundName());
+                        p.playSound(p.getLocation(), sd, settings.getInsertSoundVolume(), settings.getInsertSoundPitch());
+                    }
+                }catch (IllegalArgumentException ex){
+                    p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.8f, 1.4f);
+                }
+                break;
+            case COAL_BLOCK:
+                m.onClickCoal(p, settings);
+                // 남은 추첨횟수 액션바 갱신
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new TextComponent(Text.color("&b추첨 &f" + m.getTokens() + "/" + settings.getMaxTokens())));
+                break;
+            case DIAMOND_BLOCK:
+                m.onClickDiamond(p, settings, ranking);
+                break;
+            default: break;
         }
     }
-        
 }

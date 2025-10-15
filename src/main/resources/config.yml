@@ -3,118 +3,61 @@ ball:
   display-name: "§b구슬"
 
 machine:
-  columns:
-    edge-material: GLASS
-    inner-material: IRON_BARS
-    rows:                # 아래(1층) → 위로
-      - edge: GLASS
-        inner: IRON_BARS
-      - edge: GLASS
-        inner: IRON_BARS
-      - edge: GLASS
-        inner: IRON_BARS
   height: 6
-  ascend-ticks: 2
+  ascend-ticks: 6              # 구슬 상승 속도(숫자 ↑ = 더 느리게 이동)
   show-into-hopper: true
   max-simultaneous-balls: 12
   require-exclusive-ball: true
-  idle-timeout-seconds: 120
+  idle-timeout-seconds: 30     # 무입력 자동 점유 해제(초)
 
 draw:
   max-tokens: 5
-  auto-consume: true
-  auto-consume-delay-ticks: 20
-  match-probability: 0.006
+  match-probability: 0.10      # 3개 일치(스테이지 진입 확률)
   spin:
     total-ticks: 80
     first-stop: 40
     second-stop: 60
+  ui:
+    normal-draw:
+      mode: TITLE              # 일반 추첨 숫자 위치: TITLE|ACTIONBAR
+    stage-up-roll:
+      mode: ACTIONBAR          # 스테이지 '승급' 추첨은 액션바 고정
 
 probability:
   base:
-    # 7레인(왼→오) 합 = 1.0
-    lanes: [0.18, 0.17, 0.14, 0.04, 0.14, 0.17, 0.16]
+    lane:
+      left: 0.33
+      center: 0.34
+      right: 0.33
 
-visual:
-  deposit-into-hopper: false
-
-hud:
-  bossbar:
+jackpot:
+  hud:
     enabled: true
-
-fx:
-  reach:
-    enabled: true
-    title: "&eREACH!"
-  win:
-    title: "&6당첨!"
-  burst:
-    title: "&c버스트!"
+    style: BOSSBAR
+    title-format: "&c&l잭팟! &7(&f%drop%&7/&f%CUP%&7)"
+    color: RED
+    overlay: PROGRESS
+    stay-ticks-after-finish: 40
 
 stages:
   - id: 1
     name: "스테이지 1"
-    cup: 60
-    next-stage-chance: 0.65
-    lanes: [0.16, 0.16, 0.15, 0.06, 0.15, 0.16, 0.16]
-    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    cup: 50
+    next-stage-chance: 0.20
+    lane: { left: 0.33, center: 0.34, right: 0.33 }
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입! &7(CUP %cup%)"
     up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
   - id: 2
     name: "스테이지 2"
-    cup: 80
-    next-stage-chance: 0.40
-    lanes: [0.15, 0.15, 0.16, 0.08, 0.16, 0.15, 0.15]
-    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    cup: 70
+    next-stage-chance: 0.15
+    lane: { left: 0.32, center: 0.36, right: 0.32 }
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입! &7(CUP %cup%)"
     up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
   - id: 3
     name: "스테이지 3"
     cup: 100
-    next-stage-chance: 0.25
-    lanes: [0.14, 0.14, 0.17, 0.10, 0.17, 0.14, 0.14]
-    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입!"
+    next-stage-chance: 0.10
+    lane: { left: 0.31, center: 0.38, right: 0.31 }
+    enter-broadcast: "&e%player% 님이 &a스테이지 %stage% &e에 진입! &7(CUP %cup%)"
     up-broadcast: "&6%player% 님이 &b%from% &7→ &d%to% &6 승급!"
-
-slot:
-  spin:
-    total-ticks: 80
-    first-stop: 40
-    second-stop: 60
-  cost-item:
-    material: GOLD_NUGGET
-    display-name: "§6코인"
-  cost-per-spin: 1
-  payout:
-    three-of-a-kind:
-      SEVEN: 64
-      BAR: 32
-      BELL: 16
-      GRAPE: 8
-      CHERRY: 4
-    two-of-a-kind:
-      CHERRY: 2
-  symbols:
-    - name: SEVEN
-      display: "7"
-      weight: 1
-    - name: BAR
-      display: "BAR"
-      weight: 2
-    - name: BELL
-      display: "Bell"
-      weight: 4
-    - name: GRAPE
-      display: "Grape"
-      weight: 6
-    - name: CHERRY
-      display: "Cherry"
-      weight: 8
-
-
-draw:
-  entry-chance-on-center: 0.10  # 중앙 적중 시 스테이지1 즉시 진입 확률(스테이지0에서만)
-fx:
-  insert-sound:
-    enabled: true
-    name: ENTITY_EXPERIENCE_ORB_PICKUP
-    volume: 0.8
-    pitch: 1.4

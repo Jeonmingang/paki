@@ -1,14 +1,32 @@
 name: Pachinko
 main: com.minkang.pachinko.PachinkoPlugin
-version: "1.3.6-r3"
-api-version: 1.16
+version: 1.4.0
+api-version: "1.16"
+authors: [ "minkang" ]
+
 commands:
   파칭코:
-    description: 파칭코 시스템
-    usage: /파칭코 <설치|설정|리로드|랭킹|나가기>
+    description: 파칭코 관리 및 플레이
+    aliases: [ pachinko ]
+    usage: |
+      /파칭코 설치 <번호>
+      /파칭코 설정 구슬 <번호>
+      /파칭코 리로드
+      /파칭코 랭킹
+      /파칭코 목록
+      /파칭코 삭제 <번호>
   슬롯:
-    description: 슬롯머신 시스템
-    usage: /슬롯 <설치|아이템|리로드|나가기>
+    description: 슬롯머신 관리 및 플레이
+    aliases: [ slot, 슬롯머신 ]
+    usage: |
+      /슬롯 설치 <번호>
+      /슬롯 아이템 <번호>
+      /슬롯 리로드
+      /슬롯 목록
+      /슬롯 삭제 <번호>
+
 permissions:
   pachinko.admin:
     default: op
+  pachinko.use:
+    default: true

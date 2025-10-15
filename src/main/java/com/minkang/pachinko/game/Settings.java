@@ -179,9 +179,10 @@ public class Settings {
     public double getEntryChanceOnCenter(){
         return cfg.getDouble("draw.entry-chance-on-center", 0.0D);
     }
-    }
+    
 
     public int getAutoConsumeDelayTicks(){
         return cfg.getInt("draw.auto-consume-delay-ticks", 20);
     }
-    
+
+}

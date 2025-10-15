@@ -46,7 +46,7 @@ public class PachinkoPlugin extends JavaPlugin {
         this.slots    = new SlotManager(this);
 
         // listeners
-        getServer().getPluginManager().registerEvents(new InteractListener(this), this);
+        getServer().getPluginManager().registerEvents(new InteractListener(machines, settings, ranking, slots), this);
 
         // commands
         PluginCommand pachinkoCmd = getCommand("파칭코");

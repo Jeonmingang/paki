@@ -11,6 +11,17 @@ import java.io.IOException;
 import java.util.*;
 
 public class MachineManager {
+
+    private void runQueuedDraws(org.bukkit.entity.Player p){
+        getServer().getScheduler().runTaskLater(plugin, () -> {
+            PlayerState ps = states.get(p.getUniqueId());
+            if (ps == null) return;
+            if (ps.tokens <= 0 || ps.state != GameState.DRAW_READY) return;
+            startDraw(p); // will consume exactly 1 token
+        }, s.getAutoConsumeDelayTicks());
+    }
+    
+
         private final com.minkang.pachinko.PachinkoPlugin plugin;
 
 
@@ -134,3 +145,19 @@ new org.bukkit.scheduler.BukkitRunnable(){ public void run(){
     }
 
 }
+
+    public void listMachines(org.bukkit.command.CommandSender sender){
+        if (machines == null || machines.isEmpty()) { sender.sendMessage("§7등록된 기계가 없습니다."); return; }
+        sender.sendMessage("§e[파칭코 목록]");
+        for (java.util.Map.Entry<Integer, Machine> e : machines.entrySet()){
+            sender.sendMessage("§6#"+e.getKey()+" §7@ "+fmt(e.getValue().getBase()));
+        }
+    }
+    private String fmt(org.bukkit.Location l){ return l.getWorld().getName()+","+l.getBlockX()+","+l.getBlockY()+","+l.getBlockZ(); }
+    public void deleteTemplate(org.bukkit.command.CommandSender sender, int id){
+        Machine m = machines.remove(id);
+        if (m==null){ sender.sendMessage("§c해당 번호의 기계가 없습니다."); return; }
+        sender.sendMessage("§a삭제됨: #"+id);
+        saveAll();
+    }
+    

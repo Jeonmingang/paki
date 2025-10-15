@@ -108,3 +108,7 @@ slot:
     - name: CHERRY
       display: "Cherry"
       weight: 8
+
+
+draw:
+  entry-chance-on-center: 0.10  # 중앙 적중 시 스테이지1 즉시 진입 확률(스테이지0에서만)

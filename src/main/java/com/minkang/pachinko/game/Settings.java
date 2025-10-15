@@ -175,4 +175,13 @@ public class Settings {
     public int getInt(String path, int def){ return cfg.getInt(path, def); }
     public double getDouble(String path, double def){ return cfg.getDouble(path, def); }
     public java.util.List<?> getList(String path){ return cfg.getList(path); }
-}
+
+    public double getEntryChanceOnCenter(){
+        return cfg.getDouble("draw.entry-chance-on-center", 0.0D);
+    }
+    }
+
+    public int getAutoConsumeDelayTicks(){
+        return cfg.getInt("draw.auto-consume-delay-ticks", 20);
+    }
+    

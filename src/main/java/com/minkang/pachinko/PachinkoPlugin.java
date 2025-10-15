@@ -32,7 +32,7 @@ public class PachinkoPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(
                 new InteractListener(machines, settings, ranking, slots), this);
 
-        getCommand("파칭코").setExecutor(new RootCommand(this, machines, settings, ranking));
+        getCommand("파칭코").setExecutor(new RootCommand(this));
         getCommand("슬롯").setExecutor(slots.getCommand());
     }
 
